@@ -59,6 +59,7 @@ class DrawingViewController: UIViewController, UIPencilInteractionDelegate {
         skView = SKView(frame: view.bounds)
         skView.autoresizingMask = [.flexibleWidth, .flexibleHeight]
         skView.presentScene(scene)
+        skView.showsPhysics = true
         view.addSubview(skView)
     }
 
@@ -77,12 +78,12 @@ class DrawingViewController: UIViewController, UIPencilInteractionDelegate {
 
     @IBAction func addBall() {
         let location = CGPoint(x: scene.frame.width / 2, y: 0)
-        let ball = SKShapeNode(circleOfRadius: 20)
+        let ball = SKSpriteNode(texture: SKTexture(imageNamed: NodeType.ball.name), size: CGSize(width: 40, height: 40))
         ball.position = location
-        ball.fillColor = .red
         ball.physicsBody = SKPhysicsBody(circleOfRadius: 20)
         ball.setup(with: .ball)
-        scene.addChild(ball)
+        ballNode = ball
+        scene.addChild(ballNode)
     }
 
     func setupClearButton() {
@@ -101,6 +102,7 @@ class DrawingViewController: UIViewController, UIPencilInteractionDelegate {
     @IBAction func clearAll() {
         skView.removeFromSuperview()
         setupSpriteKitView()
+        view.sendSubviewToBack(skView)
         canvasView.drawing = PKDrawing()
     }
 }
