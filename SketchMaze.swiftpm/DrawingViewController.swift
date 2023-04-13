@@ -59,7 +59,7 @@ class DrawingViewController: UIViewController, UIPencilInteractionDelegate {
         skView = SKView(frame: view.bounds)
         skView.autoresizingMask = [.flexibleWidth, .flexibleHeight]
         skView.presentScene(scene)
-        skView.showsPhysics = true
+        skView.preferredFramesPerSecond = 120
         view.addSubview(skView)
     }
 
@@ -164,7 +164,12 @@ extension DrawingViewController: PKCanvasViewDelegate {
                 var updatedDrawing = canvasView.drawing
                 updatedDrawing.strokes.removeAll()
                 canvasView.drawing = updatedDrawing
+                self.scene.physicsWorld.speed = 1
             }
         }
+    }
+
+    func canvasViewDidBeginUsingTool(_ canvasView: PKCanvasView) {
+        self.scene.physicsWorld.speed = 0.3
     }
 }
