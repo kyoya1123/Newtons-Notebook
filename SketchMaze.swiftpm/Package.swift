@@ -10,7 +10,7 @@ import AppleProductTypes
 let package = Package(
     name: "SketchMaze",
     platforms: [
-        .iOS("15.2")
+        .iOS("16.0")
     ],
     products: [
         .iOSApplication(
@@ -24,13 +24,9 @@ let package = Package(
             accentColor: .presetColor(.indigo),
             supportedDeviceFamilies: [
                 .pad,
-                .phone
             ],
             supportedInterfaceOrientations: [
-                .portrait,
                 .landscapeRight,
-                .landscapeLeft,
-                .portraitUpsideDown(.when(deviceFamilies: [.pad]))
             ]
         )
     ],

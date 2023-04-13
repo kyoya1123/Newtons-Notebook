@@ -69,6 +69,7 @@ class DrawingViewController: UIViewController, PKCanvasViewDelegate, SKPhysicsCo
     @IBAction func addBall() {
         let location = CGPoint(x: scene.frame.width / 2, y: 0)
         let ball = SKShapeNode(circleOfRadius: 20)
+        ball.name = "ball"
         ball.position = location
         ball.fillColor = .red
         ball.physicsBody = SKPhysicsBody(circleOfRadius: 20)
@@ -93,7 +94,11 @@ class DrawingViewController: UIViewController, PKCanvasViewDelegate, SKPhysicsCo
     }
 
     @IBAction func clearAll() {
-        scene.removeAllChildren()
+        scene.children.forEach {
+            if $0.name != "background" {
+                $0.removeFromParent()
+            }
+        }
         canvasView.drawing = PKDrawing()
     }
 
@@ -124,6 +129,7 @@ class DrawingViewController: UIViewController, PKCanvasViewDelegate, SKPhysicsCo
             let image = canvasView.drawing.image(from: canvasViewBounds, scale: UIScreen.main.scale)
             let texture = SKTexture(image: image)
             let spriteNode = SKSpriteNode(texture: texture)
+            spriteNode.name = "stroke"
             spriteNode.position = CGPoint(x: self.scene.frame.midX, y: self.scene.frame.midY)
             spriteNode.size = canvasViewBounds.size
             spriteNode.physicsBody = SKPhysicsBody(texture: texture, size: spriteNode.size)
@@ -132,6 +138,11 @@ class DrawingViewController: UIViewController, PKCanvasViewDelegate, SKPhysicsCo
             spriteNode.physicsBody?.categoryBitMask = 0x1
             spriteNode.physicsBody?.collisionBitMask = 0x0
             spriteNode.physicsBody?.contactTestBitMask = 0x1
+            if canvasView.drawing.strokes.last?.ink.color == .blue {
+                spriteNode.physicsBody?.restitution = 1.0
+            } else {
+                spriteNode.physicsBody?.restitution = 0.2
+            }
 
             DispatchQueue.main.async {
                 self.scene.addChild(spriteNode)
