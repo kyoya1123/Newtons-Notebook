@@ -48,6 +48,8 @@ class DrawingViewController: UIViewController, PKCanvasViewDelegate, SKPhysicsCo
         scene.physicsWorld.contactDelegate = self
         [NodeType.fire, NodeType.goal].forEach { nodeType in
             scene.enumerateChildNodes(withName: nodeType.name) { node, _ in
+                let texture = SKTexture(imageNamed: nodeType.name)
+                node.physicsBody = SKPhysicsBody(texture: texture, size: node.frame.size)
                 node.setup(with: nodeType)
             }
         }

@@ -14,5 +14,8 @@ extension SKNode {
         physicsBody?.collisionBitMask = nodeType.collisionBitMask
         physicsBody?.contactTestBitMask = nodeType.contactTestBitMask
         physicsBody?.restitution = nodeType.restitution
+        physicsBody?.affectedByGravity = false
+        physicsBody?.isDynamic = false
+
     }
 }
