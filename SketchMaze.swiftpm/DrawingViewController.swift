@@ -50,13 +50,15 @@ class DrawingViewController: UIViewController, PKCanvasViewDelegate, SKPhysicsCo
             scene.enumerateChildNodes(withName: nodeType.name) { node, _ in
                 let texture = SKTexture(imageNamed: nodeType.name)
                 node.physicsBody = SKPhysicsBody(texture: texture, size: node.frame.size)
+                node.physicsBody?.affectedByGravity = false
+                node.physicsBody?.isDynamic = false
                 node.setup(with: nodeType)
             }
         }
         skView = SKView(frame: view.bounds)
         skView.autoresizingMask = [.flexibleWidth, .flexibleHeight]
         skView.presentScene(scene)
-        skView.showsPhysics = true
+//        skView.showsPhysics = true
         view.addSubview(skView)
     }
 
