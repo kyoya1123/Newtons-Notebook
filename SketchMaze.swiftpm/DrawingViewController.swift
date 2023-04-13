@@ -15,7 +15,6 @@ class DrawingViewController: UIViewController, PKCanvasViewDelegate, SKPhysicsCo
     private var skView: SKView!
     private var scene: SKScene!
 
-    let blueInk = PKInkingTool(ink: PKInk(.pen, color: .blue), width: 5)
     let blackInk = PKInkingTool(ink: PKInk(.pen, color: .black), width: 5)
 
     override func viewDidLoad() {
@@ -25,7 +24,7 @@ class DrawingViewController: UIViewController, PKCanvasViewDelegate, SKPhysicsCo
         setupCanvasView()
         setupAddBallButton()
         setupClearButton()
-        setupPenColorButton()
+        //        setupPenColorButton()
     }
 
     private func setupCanvasView() {
@@ -47,9 +46,15 @@ class DrawingViewController: UIViewController, PKCanvasViewDelegate, SKPhysicsCo
         scene.scaleMode = .aspectFit
         scene.physicsWorld.gravity = CGVector(dx: 0, dy: -9.8)
         scene.physicsWorld.contactDelegate = self
+        [NodeType.fire, NodeType.goal].forEach { nodeType in
+            scene.enumerateChildNodes(withName: nodeType.name) { node, _ in
+                node.setup(with: nodeType)
+            }
+        }
         skView = SKView(frame: view.bounds)
         skView.autoresizingMask = [.flexibleWidth, .flexibleHeight]
         skView.presentScene(scene)
+        skView.showsPhysics = true
         view.addSubview(skView)
     }
 
@@ -69,14 +74,10 @@ class DrawingViewController: UIViewController, PKCanvasViewDelegate, SKPhysicsCo
     @IBAction func addBall() {
         let location = CGPoint(x: scene.frame.width / 2, y: 0)
         let ball = SKShapeNode(circleOfRadius: 20)
-        ball.name = "ball"
         ball.position = location
         ball.fillColor = .red
         ball.physicsBody = SKPhysicsBody(circleOfRadius: 20)
-        ball.physicsBody?.restitution = 0.8
-        ball.physicsBody?.categoryBitMask = 0x1
-        ball.physicsBody?.collisionBitMask = 0x1
-        ball.physicsBody?.contactTestBitMask = 0x1
+        ball.setup(with: .ball)
         scene.addChild(ball)
     }
 
@@ -95,29 +96,29 @@ class DrawingViewController: UIViewController, PKCanvasViewDelegate, SKPhysicsCo
 
     @IBAction func clearAll() {
         scene.children.forEach {
-            if $0.name != "background" {
+            if $0.name == NodeType.ball.name || $0.name == NodeType.line.name {
                 $0.removeFromParent()
             }
         }
         canvasView.drawing = PKDrawing()
     }
 
-    func setupPenColorButton() {
-        let penColorButton = UIButton(type: .system)
-        penColorButton.setTitle("Switch Pen Color", for: .normal)
-        penColorButton.addTarget(self, action: #selector(togglePenColor), for: .touchUpInside)
-        penColorButton.translatesAutoresizingMaskIntoConstraints = false
-        view.addSubview(penColorButton)
+    //    func setupPenColorButton() {
+    //        let penColorButton = UIButton(type: .system)
+    //        penColorButton.setTitle("Switch Pen Color", for: .normal)
+    //        penColorButton.addTarget(self, action: #selector(togglePenColor), for: .touchUpInside)
+    //        penColorButton.translatesAutoresizingMaskIntoConstraints = false
+    //        view.addSubview(penColorButton)
+    //
+    //        NSLayoutConstraint.activate([
+    //            penColorButton.topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.topAnchor, constant: 48),
+    //            penColorButton.leadingAnchor.constraint(equalTo: view.safeAreaLayoutGuide.leadingAnchor, constant: 8)
+    //        ])
+    //    }
 
-        NSLayoutConstraint.activate([
-            penColorButton.topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.topAnchor, constant: 48),
-            penColorButton.leadingAnchor.constraint(equalTo: view.safeAreaLayoutGuide.leadingAnchor, constant: 8)
-        ])
-    }
-
-    @IBAction func togglePenColor() {
-        canvasView.tool = canvasView.tool as! PKInkingTool == blackInk ? blueInk : blackInk
-    }
+    //    @IBAction func togglePenColor() {
+    //        canvasView.tool = canvasView.tool as! PKInkingTool == blackInk ? blueInk : blackInk
+    //    }
 
     func canvasViewDrawingDidChange(_ canvasView: PKCanvasView) {
         let lastStrokeIndex = canvasView.drawing.strokes.count - 1
@@ -128,24 +129,16 @@ class DrawingViewController: UIViewController, PKCanvasViewDelegate, SKPhysicsCo
         DispatchQueue.global(qos: .userInitiated).async {
             let image = canvasView.drawing.image(from: canvasViewBounds, scale: UIScreen.main.scale)
             let texture = SKTexture(image: image)
-            let spriteNode = SKSpriteNode(texture: texture)
-            spriteNode.name = "stroke"
-            spriteNode.position = CGPoint(x: self.scene.frame.midX, y: self.scene.frame.midY)
-            spriteNode.size = canvasViewBounds.size
-            spriteNode.physicsBody = SKPhysicsBody(texture: texture, size: spriteNode.size)
-            spriteNode.physicsBody?.isDynamic = false
-            spriteNode.physicsBody?.affectedByGravity = false
-            spriteNode.physicsBody?.categoryBitMask = 0x1
-            spriteNode.physicsBody?.collisionBitMask = 0x0
-            spriteNode.physicsBody?.contactTestBitMask = 0x1
-            if canvasView.drawing.strokes.last?.ink.color == .blue {
-                spriteNode.physicsBody?.restitution = 1.0
-            } else {
-                spriteNode.physicsBody?.restitution = 0.2
-            }
+            let lineNode = SKSpriteNode(texture: texture)
+            lineNode.position = CGPoint(x: self.scene.frame.midX, y: self.scene.frame.midY)
+            lineNode.size = canvasViewBounds.size
+            lineNode.physicsBody = SKPhysicsBody(texture: texture, size: lineNode.size)
+            lineNode.physicsBody?.isDynamic = false
+            lineNode.physicsBody?.affectedByGravity = false
+            lineNode.setup(with: .line)
 
             DispatchQueue.main.async {
-                self.scene.addChild(spriteNode)
+                self.scene.addChild(lineNode)
                 var updatedDrawing = canvasView.drawing
                 updatedDrawing.strokes.removeAll()
                 canvasView.drawing = updatedDrawing
@@ -153,7 +146,22 @@ class DrawingViewController: UIViewController, PKCanvasViewDelegate, SKPhysicsCo
         }
     }
 
-    func pencilInteractionDidTap(_ interaction: UIPencilInteraction) {
-        togglePenColor()
+    func didBegin(_ contact: SKPhysicsContact) {
+        let nodeA = contact.bodyA.node
+        let nodeB = contact.bodyB.node
+        guard let nodeNameA = nodeA?.name else { return }
+        switch nodeNameA {
+        case NodeType.fire.name:
+            nodeB?.removeFromParent()
+            print("MISS")
+        case NodeType.goal.name:
+            nodeB?.removeFromParent()
+            print("GOAL!!")
+        default: break
+        }
     }
+
+    //    func pencilInteractionDidTap(_ interaction: UIPencilInteraction) {
+    //        togglePenColor()
+    //    }
 }
