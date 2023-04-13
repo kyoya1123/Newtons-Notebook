@@ -9,7 +9,7 @@ import UIKit
 import PencilKit
 import SpriteKit
 
-class DrawingViewController: UIViewController, PKCanvasViewDelegate, SKPhysicsContactDelegate, UIPencilInteractionDelegate {
+class DrawingViewController: UIViewController, UIPencilInteractionDelegate {
 
     private var canvasView: PKCanvasView!
     private var skView: SKView!
@@ -17,14 +17,15 @@ class DrawingViewController: UIViewController, PKCanvasViewDelegate, SKPhysicsCo
 
     let blackInk = PKInkingTool(ink: PKInk(.pen, color: .black), width: 5)
 
+    private var itemCount = 0
+    var ballNode: SKSpriteNode!
+
     override func viewDidLoad() {
         super.viewDidLoad()
-
         setupSpriteKitView()
         setupCanvasView()
         setupAddBallButton()
         setupClearButton()
-        //        setupPenColorButton()
     }
 
     private func setupCanvasView() {
@@ -46,7 +47,7 @@ class DrawingViewController: UIViewController, PKCanvasViewDelegate, SKPhysicsCo
         scene.scaleMode = .aspectFit
         scene.physicsWorld.gravity = CGVector(dx: 0, dy: -9.8)
         scene.physicsWorld.contactDelegate = self
-        [NodeType.fire, NodeType.goal].forEach { nodeType in
+        [NodeType.fire, NodeType.goal, NodeType.item].forEach { nodeType in
             scene.enumerateChildNodes(withName: nodeType.name) { node, _ in
                 let texture = SKTexture(imageNamed: nodeType.name)
                 node.physicsBody = SKPhysicsBody(texture: texture, size: node.frame.size)
@@ -58,7 +59,6 @@ class DrawingViewController: UIViewController, PKCanvasViewDelegate, SKPhysicsCo
         skView = SKView(frame: view.bounds)
         skView.autoresizingMask = [.flexibleWidth, .flexibleHeight]
         skView.presentScene(scene)
-//        skView.showsPhysics = true
         view.addSubview(skView)
     }
 
@@ -99,31 +99,47 @@ class DrawingViewController: UIViewController, PKCanvasViewDelegate, SKPhysicsCo
     }
 
     @IBAction func clearAll() {
-        scene.children.forEach {
-            if $0.name == NodeType.ball.name || $0.name == NodeType.line.name {
-                $0.removeFromParent()
-            }
-        }
+        skView.removeFromSuperview()
+        setupSpriteKitView()
         canvasView.drawing = PKDrawing()
     }
+}
 
-    //    func setupPenColorButton() {
-    //        let penColorButton = UIButton(type: .system)
-    //        penColorButton.setTitle("Switch Pen Color", for: .normal)
-    //        penColorButton.addTarget(self, action: #selector(togglePenColor), for: .touchUpInside)
-    //        penColorButton.translatesAutoresizingMaskIntoConstraints = false
-    //        view.addSubview(penColorButton)
-    //
-    //        NSLayoutConstraint.activate([
-    //            penColorButton.topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.topAnchor, constant: 48),
-    //            penColorButton.leadingAnchor.constraint(equalTo: view.safeAreaLayoutGuide.leadingAnchor, constant: 8)
-    //        ])
-    //    }
+extension DrawingViewController: SKPhysicsContactDelegate, SKSceneDelegate {
+    func didBegin(_ contact: SKPhysicsContact) {
+        let nodeA = contact.bodyA.node
+        let nodeB = contact.bodyB.node
+        guard let nodeNameA = nodeA?.name else { return }
+        switch nodeNameA {
+        case NodeType.fire.name:
+            nodeB?.removeFromParent()
+            print("MISS")
+        case NodeType.goal.name:
+            nodeB?.removeFromParent()
+            print("GOAL!!")
+        case NodeType.item.name:
+            nodeA?.removeFromParent()
+            itemCount += 1
+            print("Collect item!: \(itemCount)")
+        default: break
+        }
+    }
 
-    //    @IBAction func togglePenColor() {
-    //        canvasView.tool = canvasView.tool as! PKInkingTool == blackInk ? blueInk : blackInk
-    //    }
+    func update(_ currentTime: TimeInterval, for scene: SKScene) {
+        if isBallOutsideScreen {
+            ballNode.removeFromParent()
+        }
+    }
 
+    var isBallOutsideScreen: Bool {
+        let sceneSize = scene.size
+        let ballPosition = ballNode.position
+        return ballPosition.x < 0 || ballPosition.x > sceneSize.width ||
+        ballPosition.y < 0 || ballPosition.y > sceneSize.height
+    }
+}
+
+extension DrawingViewController: PKCanvasViewDelegate {
     func canvasViewDrawingDidChange(_ canvasView: PKCanvasView) {
         let lastStrokeIndex = canvasView.drawing.strokes.count - 1
         guard lastStrokeIndex >= 0 else { return }
@@ -149,23 +165,4 @@ class DrawingViewController: UIViewController, PKCanvasViewDelegate, SKPhysicsCo
             }
         }
     }
-
-    func didBegin(_ contact: SKPhysicsContact) {
-        let nodeA = contact.bodyA.node
-        let nodeB = contact.bodyB.node
-        guard let nodeNameA = nodeA?.name else { return }
-        switch nodeNameA {
-        case NodeType.fire.name:
-            nodeB?.removeFromParent()
-            print("MISS")
-        case NodeType.goal.name:
-            nodeB?.removeFromParent()
-            print("GOAL!!")
-        default: break
-        }
-    }
-
-    //    func pencilInteractionDidTap(_ interaction: UIPencilInteraction) {
-    //        togglePenColor()
-    //    }
 }

@@ -13,6 +13,7 @@ enum NodeType: UInt32 {
     case line = 2
     case goal = 4
     case fire = 8
+    case item = 16
 
     var name: String {
         switch self {
@@ -24,6 +25,8 @@ enum NodeType: UInt32 {
             return "goal"
         case .fire:
             return "fire"
+        case .item:
+            return "item"
         }
     }
 
@@ -37,7 +40,7 @@ enum NodeType: UInt32 {
             return NodeType.line.categoryBitMask
         case .line:
             return NodeType.ball.categoryBitMask
-        default:
+        case .fire, .goal, .item:
             return 0
         }
     }
@@ -46,7 +49,7 @@ enum NodeType: UInt32 {
         switch self {
         case .ball:
             return NodeType.line.categoryBitMask | NodeType.fire.categoryBitMask | NodeType.goal.categoryBitMask
-        case .line, .goal, .fire:
+        case .line, .goal, .fire, .item:
             return NodeType.ball.categoryBitMask
         }
     }
