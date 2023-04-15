@@ -6,7 +6,7 @@ struct ContentView: View {
 
     var body: some View {
         ZStack {
-            DrawingView(viewModel: .init())
+            DrawingView()
                 .ignoresSafeArea()
                 .layoutPriority(2)
             VStack {

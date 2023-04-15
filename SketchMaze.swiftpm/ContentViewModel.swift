@@ -8,10 +8,5 @@
 import Foundation
 
 class ContentViewModel: ObservableObject {
-    var didTapReset: (() -> Void)?
-
-    func resetButtonTapped() {
-        // Call the view controller's function via callback
-        didTapReset?()
-    }
+    
 }

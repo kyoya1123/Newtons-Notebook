@@ -12,14 +12,13 @@ import SpriteKit
 
 class DrawingViewController: UIViewController, UIPencilInteractionDelegate {
 
-    var coordinator: DrawingView.Coordinator?
-
-    private var canvasView: PKCanvasView!
-    private var skView: SKView!
+    @IBOutlet var canvasView: PKCanvasView!
+    @IBOutlet var skView: SKView!
     private var scene: SKScene!
     private var retryButton = UIButton()
 
-    var audioPlayer: AVAudioPlayer!
+    var pencilAudioPlayer: AVAudioPlayer!
+    var itemAudioPlayer: AVAudioPlayer!
 
 
     let blackInk = PKInkingTool(ink: PKInk(.pencil, color: .black), width: 5)
@@ -37,12 +36,22 @@ class DrawingViewController: UIViewController, UIPencilInteractionDelegate {
     }
 
     func setupAudioPlayer() {
-        if let soundDataAsset = NSDataAsset(name: "drawingSound") {
+        if let pencilSoundDataAsset = NSDataAsset(name: "drawingSound") {
             do {
-                audioPlayer = try AVAudioPlayer(data: soundDataAsset.data)
-                audioPlayer?.numberOfLoops = -1 // 無限にループ再生する
-                audioPlayer.volume = 0.05
-                audioPlayer?.prepareToPlay()
+                pencilAudioPlayer = try AVAudioPlayer(data: pencilSoundDataAsset.data)
+                pencilAudioPlayer.numberOfLoops = -1
+                pencilAudioPlayer.volume = 0.05
+                pencilAudioPlayer.prepareToPlay()
+            } catch {
+                print("Error loading audio file: \(error.localizedDescription)")
+            }
+        }
+
+        if let itemSoundDataAsset = NSDataAsset(name: "itemSound") {
+            do {
+                itemAudioPlayer = try AVAudioPlayer(data: itemSoundDataAsset.data)
+                itemAudioPlayer.volume = 0.2
+                itemAudioPlayer.prepareToPlay()
             } catch {
                 print("Error loading audio file: \(error.localizedDescription)")
             }
@@ -54,6 +63,7 @@ class DrawingViewController: UIViewController, UIPencilInteractionDelegate {
         canvasView.backgroundColor = .clear
         canvasView.delegate = self
         canvasView.tool = blackInk
+        //TODO: pencilOnly
         canvasView.drawingPolicy = .anyInput
         let pencilInteraction = UIPencilInteraction()
         pencilInteraction.delegate = self
@@ -82,6 +92,7 @@ class DrawingViewController: UIViewController, UIPencilInteractionDelegate {
         skView.autoresizingMask = [.flexibleWidth, .flexibleHeight]
         skView.presentScene(scene)
         skView.preferredFramesPerSecond = 120
+        skView.ignoresSiblingOrder = true
         view.addSubview(skView)
     }
 
@@ -104,6 +115,7 @@ class DrawingViewController: UIViewController, UIPencilInteractionDelegate {
         ball.position = location
         ball.physicsBody = SKPhysicsBody(circleOfRadius: 20)
         ball.setup(with: .ball)
+        ball.zPosition = 1
         ballNode = ball
         scene.addChild(ballNode)
     }
@@ -141,9 +153,7 @@ extension DrawingViewController: SKPhysicsContactDelegate, SKSceneDelegate {
             nodeB?.removeFromParent()
             print("GOAL!!")
         case NodeType.item.name:
-            nodeA?.removeFromParent()
-            itemCount += 1
-            print("Collect item!: \(itemCount)")
+            getItem(node: nodeA)
         default: break
         }
     }
@@ -169,11 +179,21 @@ extension DrawingViewController: SKPhysicsContactDelegate, SKSceneDelegate {
         print("MISS")
         clearAll()
     }
+
+    func getItem(node: SKNode?) {
+        node?.removeFromParent()
+        itemCount += 1
+        print("Collect item!: \(itemCount)")
+        itemAudioPlayer.currentTime = 0
+        DispatchQueue.global(qos: .userInitiated).async {
+            self.itemAudioPlayer.play()
+        }
+    }
 }
 
 extension DrawingViewController: PKCanvasViewDelegate {
     func canvasViewDrawingDidChange(_ canvasView: PKCanvasView) {
-        audioPlayer.stop()
+        pencilAudioPlayer.stop()
         let lastStrokeIndex = canvasView.drawing.strokes.count - 1
         guard lastStrokeIndex >= 0 else { return }
 
@@ -189,6 +209,7 @@ extension DrawingViewController: PKCanvasViewDelegate {
             lineNode.physicsBody?.isDynamic = false
             lineNode.physicsBody?.affectedByGravity = false
             lineNode.setup(with: .line)
+            lineNode.zPosition = 1
 
             DispatchQueue.main.async {
                 self.scene.addChild(lineNode)
@@ -202,6 +223,8 @@ extension DrawingViewController: PKCanvasViewDelegate {
 
     func canvasViewDidBeginUsingTool(_ canvasView: PKCanvasView) {
         self.scene.physicsWorld.speed = 0.3
-        audioPlayer.play()
+        DispatchQueue.global(qos: .userInitiated).async {
+            self.pencilAudioPlayer.play()
+        }
     }
 }
