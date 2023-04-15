@@ -12,10 +12,11 @@ import SpriteKit
 
 class DrawingViewController: UIViewController, UIPencilInteractionDelegate {
 
+    var coordinator: DrawingView.Coordinator?
+
     @IBOutlet var canvasView: PKCanvasView!
     @IBOutlet var skView: SKView!
     private var scene: SKScene!
-    private var retryButton = UIButton()
 
     var pencilAudioPlayer: AVAudioPlayer!
     var itemAudioPlayer: AVAudioPlayer!
@@ -30,11 +31,9 @@ class DrawingViewController: UIViewController, UIPencilInteractionDelegate {
         super.viewDidLoad()
         setupSpriteKitView()
         setupCanvasView()
-        setupAddBallButton()
-        setupClearButton()
         setupAudioPlayer()
     }
-
+    
     func setupAudioPlayer() {
         if let pencilSoundDataAsset = NSDataAsset(name: "drawingSound") {
             do {
@@ -79,6 +78,7 @@ class DrawingViewController: UIViewController, UIPencilInteractionDelegate {
         scene.physicsWorld.gravity = CGVector(dx: 0, dy: -9.8)
         scene.delegate = self
         scene.physicsWorld.contactDelegate = self
+        scene.childNode(withName: "background")?.zPosition = -1
         [NodeType.fire, NodeType.goal, NodeType.item].forEach { nodeType in
             scene.enumerateChildNodes(withName: nodeType.name) { node, _ in
                 let texture = SKTexture(imageNamed: nodeType.name)
@@ -96,20 +96,8 @@ class DrawingViewController: UIViewController, UIPencilInteractionDelegate {
         view.addSubview(skView)
     }
 
-    func setupAddBallButton() {
-        let addButton = UIButton(type: .system)
-        addButton.setTitle("Add Ball", for: .normal)
-        addButton.addTarget(self, action: #selector(addBall), for: .touchUpInside)
-        addButton.translatesAutoresizingMaskIntoConstraints = false
-        view.addSubview(addButton)
-
-        NSLayoutConstraint.activate([
-            addButton.topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.topAnchor, constant: 8),
-            addButton.trailingAnchor.constraint(equalTo: view.safeAreaLayoutGuide.trailingAnchor, constant: -8)
-        ])
-    }
-
-    @IBAction func addBall() {
+    func addBall() {
+        guard ballNode == nil else { return }
         let location = CGPoint(x: 200, y: 0)
         let ball = SKSpriteNode(texture: SKTexture(imageNamed: NodeType.ball.name), size: CGSize(width: 40, height: 40))
         ball.position = location
@@ -120,22 +108,11 @@ class DrawingViewController: UIViewController, UIPencilInteractionDelegate {
         scene.addChild(ballNode)
     }
 
-    func setupClearButton() {
-        let clearButton = UIButton(type: .system)
-        clearButton.setTitle("Reset", for: .normal)
-        clearButton.addTarget(self, action: #selector(clearAll), for: .touchUpInside)
-        clearButton.translatesAutoresizingMaskIntoConstraints = false
-        view.addSubview(clearButton)
-
-        NSLayoutConstraint.activate([
-            clearButton.topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.topAnchor, constant: 8),
-            clearButton.leadingAnchor.constraint(equalTo: view.safeAreaLayoutGuide.leadingAnchor, constant: 8)
-        ])
-    }
-
-    @IBAction func clearAll() {
+    func retry() {
         skView.removeFromSuperview()
         setupSpriteKitView()
+        ballNode = nil
+        itemCount = 0
         view.sendSubviewToBack(skView)
         canvasView.drawing = PKDrawing()
     }
@@ -151,7 +128,7 @@ extension DrawingViewController: SKPhysicsContactDelegate, SKSceneDelegate {
             missedBall()
         case NodeType.goal.name:
             nodeB?.removeFromParent()
-            print("GOAL!!")
+            goal()
         case NodeType.item.name:
             getItem(node: nodeA)
         default: break
@@ -177,7 +154,7 @@ extension DrawingViewController: SKPhysicsContactDelegate, SKSceneDelegate {
         ballNode.removeFromParent()
         ballNode = nil
         print("MISS")
-        clearAll()
+        retry()
     }
 
     func getItem(node: SKNode?) {
@@ -189,11 +166,15 @@ extension DrawingViewController: SKPhysicsContactDelegate, SKSceneDelegate {
             self.itemAudioPlayer.play()
         }
     }
+
+    func goal() {
+        coordinator?.goal()
+        retry()
+    }
 }
 
 extension DrawingViewController: PKCanvasViewDelegate {
     func canvasViewDrawingDidChange(_ canvasView: PKCanvasView) {
-        pencilAudioPlayer.stop()
         let lastStrokeIndex = canvasView.drawing.strokes.count - 1
         guard lastStrokeIndex >= 0 else { return }
 
@@ -219,6 +200,10 @@ extension DrawingViewController: PKCanvasViewDelegate {
                 self.scene.physicsWorld.speed = 1
             }
         }
+    }
+
+    func canvasViewDidEndUsingTool(_ canvasView: PKCanvasView) {
+        pencilAudioPlayer.stop()
     }
 
     func canvasViewDidBeginUsingTool(_ canvasView: PKCanvasView) {

@@ -6,18 +6,30 @@ struct ContentView: View {
 
     var body: some View {
         ZStack {
-            DrawingView()
+            
+            DrawingView(contentViewModel: viewModel)
                 .ignoresSafeArea()
                 .layoutPriority(2)
+            Text("GOAL!!")
+                .font(.title)
+                .foregroundColor(viewModel.isTextHidden ? .clear : .black)
             VStack {
                 HStack {
-//                    Button {
-//                        viewModel.resetButtonTapped()
-//                    } label: {
-//                        Image("retry")
-//                            .resizable()
-//                            .frame(width: 80, height: 80)
-//                    }
+                    Spacer()
+                        .frame(maxWidth: 16)
+                    Button {
+                        viewModel.didTapRetry()
+                    } label: {
+                        Image("retry")
+                            .resizable()
+                            .frame(width: 80, height: 80)
+                    }
+
+                    Button {
+                        viewModel.didTapAddBall()
+                    } label: {
+                        Text("🍎")
+                    }
                     Spacer()
                 }
                 Spacer()
