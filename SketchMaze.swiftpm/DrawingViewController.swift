@@ -5,17 +5,24 @@
 //  Created by Kyoya Yamaguchi on 2023/04/12.
 //
 
+import AVFoundation
 import UIKit
 import PencilKit
 import SpriteKit
 
 class DrawingViewController: UIViewController, UIPencilInteractionDelegate {
 
+    var coordinator: DrawingView.Coordinator?
+
     private var canvasView: PKCanvasView!
     private var skView: SKView!
     private var scene: SKScene!
+    private var retryButton = UIButton()
 
-    let blackInk = PKInkingTool(ink: PKInk(.pen, color: .black), width: 5)
+    var audioPlayer: AVAudioPlayer!
+
+
+    let blackInk = PKInkingTool(ink: PKInk(.pencil, color: .black), width: 5)
 
     private var itemCount = 0
     var ballNode: SKSpriteNode!
@@ -26,14 +33,28 @@ class DrawingViewController: UIViewController, UIPencilInteractionDelegate {
         setupCanvasView()
         setupAddBallButton()
         setupClearButton()
+        setupAudioPlayer()
     }
 
+    func setupAudioPlayer() {
+        if let soundDataAsset = NSDataAsset(name: "drawingSound") {
+            do {
+                audioPlayer = try AVAudioPlayer(data: soundDataAsset.data)
+                audioPlayer?.numberOfLoops = -1 // 無限にループ再生する
+                audioPlayer.volume = 0.05
+                audioPlayer?.prepareToPlay()
+            } catch {
+                print("Error loading audio file: \(error.localizedDescription)")
+            }
+        }
+    }
+    
     private func setupCanvasView() {
         canvasView = PKCanvasView(frame: view.bounds)
         canvasView.backgroundColor = .clear
         canvasView.delegate = self
-        canvasView.drawingPolicy = .anyInput
         canvasView.tool = blackInk
+        canvasView.drawingPolicy = .anyInput
         let pencilInteraction = UIPencilInteraction()
         pencilInteraction.delegate = self
         view.addInteraction(pencilInteraction)
@@ -41,11 +62,12 @@ class DrawingViewController: UIViewController, UIPencilInteractionDelegate {
     }
 
     private func setupSpriteKitView() {
-        guard let myScene = SKScene(fileNamed: "MyScene") else { return }
+        guard let myScene = SKScene(fileNamed: "stage1") else { return }
         scene = myScene
         scene.size = view.bounds.size
         scene.scaleMode = .aspectFit
         scene.physicsWorld.gravity = CGVector(dx: 0, dy: -9.8)
+        scene.delegate = self
         scene.physicsWorld.contactDelegate = self
         [NodeType.fire, NodeType.goal, NodeType.item].forEach { nodeType in
             scene.enumerateChildNodes(withName: nodeType.name) { node, _ in
@@ -77,7 +99,7 @@ class DrawingViewController: UIViewController, UIPencilInteractionDelegate {
     }
 
     @IBAction func addBall() {
-        let location = CGPoint(x: scene.frame.width / 2, y: 0)
+        let location = CGPoint(x: 200, y: 0)
         let ball = SKSpriteNode(texture: SKTexture(imageNamed: NodeType.ball.name), size: CGSize(width: 40, height: 40))
         ball.position = location
         ball.physicsBody = SKPhysicsBody(circleOfRadius: 20)
@@ -88,7 +110,7 @@ class DrawingViewController: UIViewController, UIPencilInteractionDelegate {
 
     func setupClearButton() {
         let clearButton = UIButton(type: .system)
-        clearButton.setTitle("Clear", for: .normal)
+        clearButton.setTitle("Reset", for: .normal)
         clearButton.addTarget(self, action: #selector(clearAll), for: .touchUpInside)
         clearButton.translatesAutoresizingMaskIntoConstraints = false
         view.addSubview(clearButton)
@@ -114,8 +136,7 @@ extension DrawingViewController: SKPhysicsContactDelegate, SKSceneDelegate {
         guard let nodeNameA = nodeA?.name else { return }
         switch nodeNameA {
         case NodeType.fire.name:
-            nodeB?.removeFromParent()
-            print("MISS")
+            missedBall()
         case NodeType.goal.name:
             nodeB?.removeFromParent()
             print("GOAL!!")
@@ -129,20 +150,30 @@ extension DrawingViewController: SKPhysicsContactDelegate, SKSceneDelegate {
 
     func update(_ currentTime: TimeInterval, for scene: SKScene) {
         if isBallOutsideScreen {
-            ballNode.removeFromParent()
+            missedBall()
         }
     }
 
     var isBallOutsideScreen: Bool {
+        if ballNode == nil { return false }
         let sceneSize = scene.size
         let ballPosition = ballNode.position
-        return ballPosition.x < 0 || ballPosition.x > sceneSize.width ||
-        ballPosition.y < 0 || ballPosition.y > sceneSize.height
+        let threshold: CGFloat = 20
+        return ballPosition.x < -threshold || ballPosition.x > sceneSize.width + threshold ||
+        ballPosition.y > threshold || ballPosition.y < -(sceneSize.height + threshold)
+    }
+
+    func missedBall() {
+        ballNode.removeFromParent()
+        ballNode = nil
+        print("MISS")
+        clearAll()
     }
 }
 
 extension DrawingViewController: PKCanvasViewDelegate {
     func canvasViewDrawingDidChange(_ canvasView: PKCanvasView) {
+        audioPlayer.stop()
         let lastStrokeIndex = canvasView.drawing.strokes.count - 1
         guard lastStrokeIndex >= 0 else { return }
 
@@ -171,5 +202,6 @@ extension DrawingViewController: PKCanvasViewDelegate {
 
     func canvasViewDidBeginUsingTool(_ canvasView: PKCanvasView) {
         self.scene.physicsWorld.speed = 0.3
+        audioPlayer.play()
     }
 }
