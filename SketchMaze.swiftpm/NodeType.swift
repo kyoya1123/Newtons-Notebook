@@ -26,12 +26,12 @@ enum NodeType: UInt32 {
         case .fire:
             return "fire"
         case .item:
-            return "item"
+            return ""
         }
     }
 
     var categoryBitMask: UInt32 {
-        return self.rawValue
+        return rawValue
     }
 
     var collisionBitMask: UInt32 {

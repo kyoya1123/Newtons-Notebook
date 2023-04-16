@@ -26,7 +26,8 @@ class GameSceneViewController: UIViewController, UIPencilInteractionDelegate {
     let blackInk = PKInkingTool(ink: PKInk(.pencil, color: .black), width: 5)
     
 
-    private var itemCount = 0
+    var collectedItems = [Item]()
+    var newlyCollectedItems = [Item]()
     var ballNode: SKSpriteNode!
 
     override func viewDidLoad() {
@@ -81,7 +82,7 @@ class GameSceneViewController: UIViewController, UIPencilInteractionDelegate {
         view.addSubview(skView)
     }
 
-    private func setupScene(stage: Stage) {
+    private func setupScene(stage: Stage, isRetry: Bool = false) {
         if scene != nil {
             scene.removeFromParent()
         }
@@ -93,7 +94,7 @@ class GameSceneViewController: UIViewController, UIPencilInteractionDelegate {
         scene.delegate = self
         scene.physicsWorld.contactDelegate = self
         scene.childNode(withName: "background")?.zPosition = -1
-        [NodeType.fire, NodeType.goal, NodeType.item].forEach { nodeType in
+        [NodeType.fire, NodeType.goal].forEach { nodeType in
             scene.enumerateChildNodes(withName: nodeType.name) { node, _ in
                 guard let texture = (node as? SKSpriteNode)?.texture else { return }
                 node.physicsBody = SKPhysicsBody(texture: texture, size: node.frame.size)
@@ -103,7 +104,17 @@ class GameSceneViewController: UIViewController, UIPencilInteractionDelegate {
                 node.setup(with: nodeType)
             }
         }
-        if currentStage == .instruction {
+        Item.allCases.forEach { item in
+            scene.enumerateChildNodes(withName: item.name) { node, _ in
+                guard let texture = (node as? SKSpriteNode)?.texture else { return }
+                node.physicsBody = SKPhysicsBody(texture: texture, size: node.frame.size)
+                node.physicsBody?.affectedByGravity = false
+                node.physicsBody?.isDynamic = false
+                node.zPosition = 1
+                node.setup(with: .item)
+            }
+        }
+        if currentStage == .instruction || isRetry {
             skView.presentScene(scene)
         } else {
             skView.presentScene(scene, transition: .push(with: .left, duration: 2))
@@ -123,27 +134,27 @@ class GameSceneViewController: UIViewController, UIPencilInteractionDelegate {
     }
 
     func retry() {
-        setupScene(stage: currentStage)
+        setupScene(stage: currentStage, isRetry: true)
         ballNode = nil
-        itemCount = 0
+        newlyCollectedItems = []
+        print("Collected Items: \(collectedItems)")
         canvasView.drawing = PKDrawing()
     }
 }
 
 extension GameSceneViewController: SKPhysicsContactDelegate, SKSceneDelegate {
     func didBegin(_ contact: SKPhysicsContact) {
-        let nodeA = contact.bodyA.node
-        let nodeB = contact.bodyB.node
-        guard let nodeNameA = nodeA?.name else { return }
-        switch nodeNameA {
+        guard let nodeA = contact.bodyA.node, let nodeB = contact.bodyB.node else { return }
+        switch nodeA.name {
         case NodeType.fire.name:
             missedBall()
         case NodeType.goal.name:
-            nodeB?.removeFromParent()
+            nodeB.removeFromParent()
             goal()
-        case NodeType.item.name:
-            getItem(node: nodeA)
-        default: break
+        default:
+            if Item.allCases.map({ $0.name }).contains(nodeA.name) {
+                getItem(node: nodeA)
+            }
         }
     }
 
@@ -178,10 +189,11 @@ extension GameSceneViewController: SKPhysicsContactDelegate, SKSceneDelegate {
         self.ballNode = nil
     }
 
-    func getItem(node: SKNode?) {
-        node?.removeFromParent()
-        itemCount += 1
-        print("Collect item!: \(itemCount)")
+    func getItem(node: SKNode) {
+        node.removeFromParent()
+        guard let item = Item(rawValue: node.name ?? "") else { return }
+        newlyCollectedItems.append(item)
+        print("Collected Items: \(collectedItems)")
         DispatchQueue.global(qos: .userInitiated).async {
             self.itemAudioPlayer.currentTime = 0
             self.itemAudioPlayer.play()
@@ -191,6 +203,8 @@ extension GameSceneViewController: SKPhysicsContactDelegate, SKSceneDelegate {
     func goal() {
         coordinator?.goal()
         removeBall()
+        collectedItems += newlyCollectedItems
+        newlyCollectedItems = []
         guard let nextStage = currentStage.next else {
             //ending
             return

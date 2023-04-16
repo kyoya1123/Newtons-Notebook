@@ -14,7 +14,7 @@ enum Stage: String, CaseIterable {
     case stage3
     
     var scene: SKScene {
-        SKScene(fileNamed: self.rawValue)!
+        SKScene(fileNamed: rawValue)!
     }
 
     var next: Stage? {

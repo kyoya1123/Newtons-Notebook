@@ -9,7 +9,9 @@ import SpriteKit
 
 extension SKNode {
     func setup(with nodeType: NodeType) {
-        name = nodeType.name
+        if nodeType != .item {
+            name = nodeType.name
+        }
         physicsBody?.categoryBitMask = nodeType.categoryBitMask
         physicsBody?.collisionBitMask = nodeType.collisionBitMask
         physicsBody?.contactTestBitMask = nodeType.contactTestBitMask
