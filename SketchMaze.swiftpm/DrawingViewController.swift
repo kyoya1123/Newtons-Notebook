@@ -23,6 +23,7 @@ class DrawingViewController: UIViewController, UIPencilInteractionDelegate {
 
 
     let blackInk = PKInkingTool(ink: PKInk(.pencil, color: .black), width: 5)
+    
 
     private var itemCount = 0
     var ballNode: SKSpriteNode!
@@ -81,10 +82,11 @@ class DrawingViewController: UIViewController, UIPencilInteractionDelegate {
         scene.childNode(withName: "background")?.zPosition = -1
         [NodeType.fire, NodeType.goal, NodeType.item].forEach { nodeType in
             scene.enumerateChildNodes(withName: nodeType.name) { node, _ in
-                let texture = SKTexture(imageNamed: nodeType.name)
+                guard let texture = (node as? SKSpriteNode)?.texture else { return }
                 node.physicsBody = SKPhysicsBody(texture: texture, size: node.frame.size)
                 node.physicsBody?.affectedByGravity = false
                 node.physicsBody?.isDynamic = false
+                node.zPosition = 1
                 node.setup(with: nodeType)
             }
         }
@@ -103,7 +105,7 @@ class DrawingViewController: UIViewController, UIPencilInteractionDelegate {
         ball.position = location
         ball.physicsBody = SKPhysicsBody(circleOfRadius: 20)
         ball.setup(with: .ball)
-        ball.zPosition = 1
+        ball.zPosition = 2
         ballNode = ball
         scene.addChild(ballNode)
     }
@@ -161,8 +163,8 @@ extension DrawingViewController: SKPhysicsContactDelegate, SKSceneDelegate {
         node?.removeFromParent()
         itemCount += 1
         print("Collect item!: \(itemCount)")
-        itemAudioPlayer.currentTime = 0
         DispatchQueue.global(qos: .userInitiated).async {
+            self.itemAudioPlayer.currentTime = 0
             self.itemAudioPlayer.play()
         }
     }
