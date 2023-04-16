@@ -37,7 +37,8 @@ class GameSceneViewController: UIViewController, UIPencilInteractionDelegate {
         setupAudioPlayer()
         setupScene(stage: .instruction)
     }
-    
+
+
     func setupAudioPlayer() {
         if let pencilSoundDataAsset = NSDataAsset(name: "drawingSound") {
             do {

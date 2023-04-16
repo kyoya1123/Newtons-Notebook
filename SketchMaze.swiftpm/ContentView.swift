@@ -35,6 +35,9 @@ struct ContentView: View {
                 Spacer()
             }
         }
+        .onAppear {
+            viewModel.setupScene()
+        }
     }
 }
 

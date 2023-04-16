@@ -13,6 +13,7 @@ class ContentViewModel: ObservableObject {
     @Published var isTextHidden = true
     let retryAction = PassthroughSubject<Void, Never>()
     let addBallAction = PassthroughSubject<Void, Never>()
+    let setupAction = PassthroughSubject<Void, Never>()
 
     func didGoal() {
         isTextHidden = false
@@ -24,5 +25,9 @@ class ContentViewModel: ObservableObject {
 
     func didTapAddBall() {
         addBallAction.send()
+    }
+
+    func setupScene() {
+        setupAction.send()
     }
 }

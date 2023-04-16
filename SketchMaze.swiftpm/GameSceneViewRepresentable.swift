@@ -41,6 +41,10 @@ struct GameSceneViewRepresentable: UIViewControllerRepresentable {
             contentViewModel.addBallAction.sink { [weak self] _ in
                 self?.addBall()
             }.store(in: &cancellables)
+
+            contentViewModel.setupAction.sink { [weak self] _ in
+                self?.setup()
+            }.store(in: &cancellables)
         }
 
         func goal() {
@@ -53,6 +57,10 @@ struct GameSceneViewRepresentable: UIViewControllerRepresentable {
 
         func addBall() {
             viewController.addBall()
+        }
+
+        func setup() {
+            viewController.setup()
         }
     }
 }
