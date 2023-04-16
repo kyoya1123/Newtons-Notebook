@@ -10,9 +10,9 @@ import UIKit
 import PencilKit
 import SpriteKit
 
-class DrawingViewController: UIViewController, UIPencilInteractionDelegate {
+class GameSceneViewController: UIViewController, UIPencilInteractionDelegate {
 
-    var coordinator: DrawingView.Coordinator?
+    var coordinator: GameSceneViewRepresentable.Coordinator?
 
     @IBOutlet var canvasView: PKCanvasView!
     @IBOutlet var skView: SKView!
@@ -120,7 +120,7 @@ class DrawingViewController: UIViewController, UIPencilInteractionDelegate {
     }
 }
 
-extension DrawingViewController: SKPhysicsContactDelegate, SKSceneDelegate {
+extension GameSceneViewController: SKPhysicsContactDelegate, SKSceneDelegate {
     func didBegin(_ contact: SKPhysicsContact) {
         let nodeA = contact.bodyA.node
         let nodeB = contact.bodyB.node
@@ -175,7 +175,7 @@ extension DrawingViewController: SKPhysicsContactDelegate, SKSceneDelegate {
     }
 }
 
-extension DrawingViewController: PKCanvasViewDelegate {
+extension GameSceneViewController: PKCanvasViewDelegate {
     func canvasViewDrawingDidChange(_ canvasView: PKCanvasView) {
         let lastStrokeIndex = canvasView.drawing.strokes.count - 1
         guard lastStrokeIndex >= 0 else { return }

@@ -7,7 +7,7 @@ struct ContentView: View {
     var body: some View {
         ZStack {
             
-            DrawingView(contentViewModel: viewModel)
+            GameSceneViewRepresentable(contentViewModel: viewModel)
                 .ignoresSafeArea()
                 .layoutPriority(2)
             Text("GOAL!!")

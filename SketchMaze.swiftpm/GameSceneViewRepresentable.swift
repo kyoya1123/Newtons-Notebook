@@ -1,21 +1,21 @@
 import SwiftUI
 import Combine
 
-struct DrawingView: UIViewControllerRepresentable {
-    typealias UIViewControllerType = DrawingViewController
+struct GameSceneViewRepresentable: UIViewControllerRepresentable {
+    typealias UIViewControllerType = GameSceneViewController
 
     @ObservedObject var contentViewModel: ContentViewModel
 
-    func makeUIViewController(context: Context) -> DrawingViewController {
+    func makeUIViewController(context: Context) -> GameSceneViewController {
         return context.coordinator.viewController
     }
 
-    func updateUIViewController(_ uiViewController: DrawingViewController, context: Context) {
+    func updateUIViewController(_ uiViewController: GameSceneViewController, context: Context) {
         // 何もしない
     }
 
     func makeCoordinator() -> Coordinator {
-        let viewController = DrawingViewController()
+        let viewController = GameSceneViewController()
         return Coordinator(contentViewModel: contentViewModel, viewController: viewController)
     }
 
@@ -24,9 +24,9 @@ struct DrawingView: UIViewControllerRepresentable {
         var cancellables = Set<AnyCancellable>()
 
         var contentViewModel: ContentViewModel
-        var viewController: DrawingViewController
+        var viewController: GameSceneViewController
 
-        init(contentViewModel: ContentViewModel, viewController: DrawingViewController) {
+        init(contentViewModel: ContentViewModel, viewController: GameSceneViewController) {
             self.contentViewModel = contentViewModel
             self.viewController = viewController
             super.init()
