@@ -16,6 +16,7 @@ class GameSceneViewController: UIViewController, UIPencilInteractionDelegate {
 
     @IBOutlet var canvasView: PKCanvasView!
     @IBOutlet var skView: SKView!
+    var currentStage: Stage = .instruction
     private var scene: SKScene!
 
     var pencilAudioPlayer: AVAudioPlayer!
@@ -33,6 +34,7 @@ class GameSceneViewController: UIViewController, UIPencilInteractionDelegate {
         setupSpriteKitView()
         setupCanvasView()
         setupAudioPlayer()
+        setupScene(stage: .instruction)
     }
     
     func setupAudioPlayer() {
@@ -72,8 +74,19 @@ class GameSceneViewController: UIViewController, UIPencilInteractionDelegate {
     }
 
     private func setupSpriteKitView() {
-        guard let myScene = SKScene(fileNamed: "stage1") else { return }
-        scene = myScene
+        skView = SKView(frame: view.bounds)
+        skView.autoresizingMask = [.flexibleWidth, .flexibleHeight]
+        skView.preferredFramesPerSecond = 120
+        skView.ignoresSiblingOrder = true
+        view.addSubview(skView)
+    }
+
+    private func setupScene(stage: Stage) {
+        if scene != nil {
+            scene.removeFromParent()
+        }
+        currentStage = stage
+        scene = stage.scene
         scene.size = view.bounds.size
         scene.scaleMode = .aspectFit
         scene.physicsWorld.gravity = CGVector(dx: 0, dy: -9.8)
@@ -90,12 +103,11 @@ class GameSceneViewController: UIViewController, UIPencilInteractionDelegate {
                 node.setup(with: nodeType)
             }
         }
-        skView = SKView(frame: view.bounds)
-        skView.autoresizingMask = [.flexibleWidth, .flexibleHeight]
-        skView.presentScene(scene)
-        skView.preferredFramesPerSecond = 120
-        skView.ignoresSiblingOrder = true
-        view.addSubview(skView)
+        if currentStage == .instruction {
+            skView.presentScene(scene)
+        } else {
+            skView.presentScene(scene, transition: .push(with: .left, duration: 2))
+        }
     }
 
     func addBall() {
@@ -111,11 +123,9 @@ class GameSceneViewController: UIViewController, UIPencilInteractionDelegate {
     }
 
     func retry() {
-        skView.removeFromSuperview()
-        setupSpriteKitView()
+        setupScene(stage: currentStage)
         ballNode = nil
         itemCount = 0
-        view.sendSubviewToBack(skView)
         canvasView.drawing = PKDrawing()
     }
 }
@@ -153,10 +163,19 @@ extension GameSceneViewController: SKPhysicsContactDelegate, SKSceneDelegate {
     }
 
     func missedBall() {
-        ballNode.removeFromParent()
-        ballNode = nil
-        print("MISS")
-        retry()
+        if currentStage == .instruction {
+            goal()
+        } else {
+            removeBall()
+            print("MISS")
+            retry()
+        }
+    }
+
+    func removeBall() {
+        let ballNode = scene.childNode(withName: NodeType.ball.name)
+        ballNode?.removeFromParent()
+        self.ballNode = nil
     }
 
     func getItem(node: SKNode?) {
@@ -171,7 +190,12 @@ extension GameSceneViewController: SKPhysicsContactDelegate, SKSceneDelegate {
 
     func goal() {
         coordinator?.goal()
-        retry()
+        removeBall()
+        guard let nextStage = currentStage.next else {
+            //ending
+            return
+        }
+        setupScene(stage: nextStage)
     }
 }
 
