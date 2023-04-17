@@ -13,13 +13,53 @@ enum Item: String, CaseIterable {
     case wave
     case gravity
     case sound
-    case spring
     case electricity
     case atom
     case astronomy
-    case pendulum
 
     var name: String {
         rawValue
+    }
+
+    var displayName: String {
+        switch self {
+        case .fluid:
+            return "Fluid"
+        case .magnet:
+            return "Magnetic Force"
+        case .wave:
+            return "Wave"
+        case .gravity:
+            return "Gravity"
+        case .sound:
+            return "Sound"
+        case .electricity:
+            return "Electricity"
+        case .atom:
+            return "Atom"
+        case .astronomy:
+            return "Astronomy"
+        }
+    }
+
+    var description: String {
+        switch self {
+        case .fluid:
+            return "Fluid description"
+        case .magnet:
+            return "Magnetic Force description"
+        case .wave:
+            return "Wave description"
+        case .gravity:
+            return "Gravity description"
+        case .sound:
+            return "Sound description"
+        case .electricity:
+            return "Electricity description"
+        case .atom:
+            return "Atom description"
+        case .astronomy:
+            return "Astronomy description"
+        }
     }
 }

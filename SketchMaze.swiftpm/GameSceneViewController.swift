@@ -23,7 +23,7 @@ class GameSceneViewController: UIViewController, UIPencilInteractionDelegate {
     var itemAudioPlayer: AVAudioPlayer!
 
 
-    let blackInk = PKInkingTool(ink: PKInk(.pencil, color: .black), width: 5)
+    let blackInk = PKInkingTool(ink: PKInk(.pen, color: .black), width: 3)
     
 
     var collectedItems = [Item]()
