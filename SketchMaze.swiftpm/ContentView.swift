@@ -38,6 +38,7 @@ struct ContentView: View {
         .onAppear {
             viewModel.setupScene()
         }
+        .navigationBarBackButtonHidden(true)
     }
 }
 
