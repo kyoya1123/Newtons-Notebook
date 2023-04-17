@@ -15,27 +15,43 @@ struct ContentView: View {
                 VStack {
                     HStack {
                         Spacer()
-                            .frame(maxWidth: 16)
                         Button {
-                            viewModel.didTapRetry()
+                            viewModel.didTapPlay()
                         } label: {
-                            Image("retry")
+                            Image(viewModel.isReadyToPlay ? "play" : "retry")
                                 .resizable()
                                 .frame(width: 80, height: 80)
                         }
-
-                        Button {
-                            viewModel.didTapAddBall()
-                        } label: {
-                            Text("🍎")
-                        }
+                        .opacity(viewModel.showGoalConfirm ? 0 : 1)
                         Spacer()
+                            .frame(maxWidth: 16)
                     }
                     Spacer()
                 }
-            }
-            .onAppear {
-                viewModel.setupScene()
+                HStack {
+                    Button {
+                        viewModel.showGoalConfirm = false
+                        viewModel.didTapPlay()
+                    } label: {
+                        Image("retry")
+                            .resizable()
+                            .frame(width: 80, height: 80)
+                    }
+                    Button {
+                        viewModel.showGoalConfirm = false
+                        viewModel.didTapGoNext()
+                    } label: {
+                        Image("next")
+                            .resizable()
+                            .frame(width: 80, height: 80)
+                    }
+                }
+                .frame(maxWidth: .infinity, maxHeight: .infinity)
+                .background {
+                    Color.black.opacity(0.2)
+                        .edgesIgnoringSafeArea(.all)
+                }
+                .opacity(viewModel.showGoalConfirm ? 1 : 0)
             }
         }
         .navigationBarBackButtonHidden(true)

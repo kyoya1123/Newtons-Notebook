@@ -38,11 +38,6 @@ class GameSceneViewController: UIViewController, UIPencilInteractionDelegate {
         setupScene(stage: .instruction)
     }
 
-    func setup() {
-//        retry()
-    }
-
-
     func setupAudioPlayer() {
         if let pencilSoundDataAsset = NSDataAsset(name: "drawingSound") {
             do {
@@ -121,10 +116,10 @@ class GameSceneViewController: UIViewController, UIPencilInteractionDelegate {
                 node.setup(with: .item)
             }
         }
-        if currentStage == .instruction || isRetry {
+        if stage == .instruction || isRetry {
             skView.presentScene(scene)
         } else {
-            skView.presentScene(scene, transition: .push(with: .left, duration: 2))
+            skView.presentScene(scene, transition: .push(with: .up, duration: 2))
         }
     }
 
@@ -164,29 +159,25 @@ extension GameSceneViewController: SKPhysicsContactDelegate, SKSceneDelegate {
         }
     }
 
-    func update(_ currentTime: TimeInterval, for scene: SKScene) {
-        if isBallOutsideScreen {
-            missedBall()
-        }
-    }
+//    func update(_ currentTime: TimeInterval, for scene: SKScene) {
+//        if isBallOutsideScreen {
+//            missedBall()
+//        }
+//    }
 
-    var isBallOutsideScreen: Bool {
-        if ballNode == nil { return false }
-        let sceneSize = scene.size
-        let ballPosition = ballNode.position
-        let threshold: CGFloat = 20
-        return ballPosition.x < -threshold || ballPosition.x > sceneSize.width + threshold ||
-        ballPosition.y > threshold || ballPosition.y < -(sceneSize.height + threshold)
-    }
+//    var isBallOutsideScreen: Bool {
+//        if ballNode == nil { return false }
+//        let sceneSize = scene.size
+//        let ballPosition = ballNode.position
+//        let threshold: CGFloat = 20
+//        return ballPosition.x < -threshold || ballPosition.x > sceneSize.width + threshold ||
+//        ballPosition.y > threshold || ballPosition.y < -(sceneSize.height + threshold)
+//    }
 
     func missedBall() {
-        if currentStage == .instruction {
-            goal()
-        } else {
-            removeBall()
-            print("MISS")
-            retry()
-        }
+        removeBall()
+        print("MISS")
+        retry()
     }
 
     func removeBall() {
@@ -207,10 +198,18 @@ extension GameSceneViewController: SKPhysicsContactDelegate, SKSceneDelegate {
     }
 
     func goal() {
-        coordinator?.goal()
+        //TODO: Goal sound
         removeBall()
         collectedItems += newlyCollectedItems
         newlyCollectedItems = []
+        if currentStage == .instruction {
+            setupNextScene()
+        } else {
+            coordinator?.showGoalConfirm()
+        }
+    }
+
+    func setupNextScene() {
         guard let nextStage = currentStage.next else {
             showResultView()
             return

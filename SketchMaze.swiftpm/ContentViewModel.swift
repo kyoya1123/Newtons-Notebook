@@ -10,27 +10,27 @@ import Combine
 
 class ContentViewModel: ObservableObject {
 
+    @Published var isReadyToPlay = true
     @Published var showResult = false
+    @Published var showGoalConfirm = false
     let retryAction = PassthroughSubject<Void, Never>()
     let addBallAction = PassthroughSubject<Void, Never>()
-    let setupAction = PassthroughSubject<Void, Never>()
+    let goNextAction = PassthroughSubject<Void, Never>()
 
     @Published var collectedItems = [Item]()
 
-    func didGoal() {
-        isTextHidden = false
+    func didTapPlay() {
+        if isReadyToPlay {
+            addBallAction.send()
+        } else {
+            retryAction.send()
+        }
+        isReadyToPlay.toggle()
     }
 
-    func didTapRetry() {
-        retryAction.send()
-    }
-
-    func didTapAddBall() {
-        addBallAction.send()
-    }
-
-    func setupScene() {
-        setupAction.send()
+    func didTapGoNext() {
+        isReadyToPlay = true
+        goNextAction.send()
     }
 
     func showResultView(collectedItems: [Item]) {

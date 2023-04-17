@@ -43,13 +43,9 @@ struct GameSceneViewRepresentable: UIViewControllerRepresentable {
                 self?.addBall()
             }.store(in: &cancellables)
 
-            contentViewModel.setupAction.sink { [weak self] _ in
-                self?.setup()
+            contentViewModel.goNextAction.sink { [weak self] _ in
+                self?.goNext()
             }.store(in: &cancellables)
-        }
-
-        func goal() {
-            contentViewModel.didGoal()
         }
 
         func retry() {
@@ -60,12 +56,16 @@ struct GameSceneViewRepresentable: UIViewControllerRepresentable {
             viewController.addBall()
         }
 
-        func setup() {
-            viewController.setup()
+        func goNext() {
+            viewController.setupNextScene()
         }
 
         func showResultView(collectedItems: [Item]) {
             contentViewModel.showResultView(collectedItems: collectedItems)
+        }
+
+        func showGoalConfirm() {
+            contentViewModel.showGoalConfirm = true
         }
     }
 }
