@@ -30,6 +30,7 @@ struct GameSceneViewRepresentable: UIViewControllerRepresentable {
             self.contentViewModel = contentViewModel
             self.viewController = viewController
             super.init()
+            viewController.coordinator = self
             subscribeToContentViewModel()
         }
 
@@ -61,6 +62,10 @@ struct GameSceneViewRepresentable: UIViewControllerRepresentable {
 
         func setup() {
             viewController.setup()
+        }
+
+        func showResultView(collectedItems: [Item]) {
+            contentViewModel.showResultView(collectedItems: collectedItems)
         }
     }
 }

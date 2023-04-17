@@ -5,40 +5,41 @@ struct ContentView: View {
     @ObservedObject var viewModel: ContentViewModel
 
     var body: some View {
-        ZStack {
-            
-            GameSceneViewRepresentable(contentViewModel: viewModel)
-                .ignoresSafeArea()
-                .layoutPriority(2)
-            Text("GOAL!!")
-                .font(.title)
-                .foregroundColor(viewModel.isTextHidden ? .clear : .black)
-            VStack {
-                HStack {
-                    Spacer()
-                        .frame(maxWidth: 16)
-                    Button {
-                        viewModel.didTapRetry()
-                    } label: {
-                        Image("retry")
-                            .resizable()
-                            .frame(width: 80, height: 80)
-                    }
+        NavigationView {
+            ZStack {
+                NavigationLink("", destination: ResultView(collectedItems: viewModel.collectedItems), isActive: $viewModel.showResult)
+                    .opacity(0)
+                GameSceneViewRepresentable(contentViewModel: viewModel)
+                    .ignoresSafeArea()
+                    .layoutPriority(2)
+                VStack {
+                    HStack {
+                        Spacer()
+                            .frame(maxWidth: 16)
+                        Button {
+                            viewModel.didTapRetry()
+                        } label: {
+                            Image("retry")
+                                .resizable()
+                                .frame(width: 80, height: 80)
+                        }
 
-                    Button {
-                        viewModel.didTapAddBall()
-                    } label: {
-                        Text("🍎")
+                        Button {
+                            viewModel.didTapAddBall()
+                        } label: {
+                            Text("🍎")
+                        }
+                        Spacer()
                     }
                     Spacer()
                 }
-                Spacer()
+            }
+            .onAppear {
+                viewModel.setupScene()
             }
         }
-        .onAppear {
-            viewModel.setupScene()
-        }
         .navigationBarBackButtonHidden(true)
+        .navigationViewStyle(.stack)
     }
 }
 

@@ -212,10 +212,14 @@ extension GameSceneViewController: SKPhysicsContactDelegate, SKSceneDelegate {
         collectedItems += newlyCollectedItems
         newlyCollectedItems = []
         guard let nextStage = currentStage.next else {
-            //ending
+            showResultView()
             return
         }
         setupScene(stage: nextStage)
+    }
+
+    func showResultView() {
+        coordinator?.showResultView(collectedItems: collectedItems)
     }
 }
 

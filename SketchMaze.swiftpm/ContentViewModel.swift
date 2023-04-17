@@ -10,10 +10,12 @@ import Combine
 
 class ContentViewModel: ObservableObject {
 
-    @Published var isTextHidden = true
+    @Published var showResult = false
     let retryAction = PassthroughSubject<Void, Never>()
     let addBallAction = PassthroughSubject<Void, Never>()
     let setupAction = PassthroughSubject<Void, Never>()
+
+    @Published var collectedItems = [Item]()
 
     func didGoal() {
         isTextHidden = false
@@ -29,5 +31,10 @@ class ContentViewModel: ObservableObject {
 
     func setupScene() {
         setupAction.send()
+    }
+
+    func showResultView(collectedItems: [Item]) {
+        self.collectedItems = collectedItems
+        showResult = true
     }
 }
