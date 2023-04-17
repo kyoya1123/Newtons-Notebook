@@ -11,7 +11,7 @@ import SpriteKit
 enum NodeType: UInt32 {
     case ball = 1
     case line = 2
-    case goal = 4
+    case basket = 4
     case fire = 8
     case item = 16
 
@@ -21,8 +21,8 @@ enum NodeType: UInt32 {
             return "ball"
         case .line:
             return "line"
-        case .goal:
-            return "goal"
+        case .basket:
+            return "basket"
         case .fire:
             return "fire"
         case .item:
@@ -40,7 +40,7 @@ enum NodeType: UInt32 {
             return NodeType.line.categoryBitMask
         case .line:
             return NodeType.ball.categoryBitMask
-        case .fire, .goal, .item:
+        case .fire, .basket, .item:
             return 0
         }
     }
@@ -48,8 +48,8 @@ enum NodeType: UInt32 {
     var contactTestBitMask: UInt32 {
         switch self {
         case .ball:
-            return NodeType.line.categoryBitMask | NodeType.fire.categoryBitMask | NodeType.goal.categoryBitMask
-        case .line, .goal, .fire, .item:
+            return NodeType.line.categoryBitMask | NodeType.fire.categoryBitMask | NodeType.basket.categoryBitMask
+        case .line, .basket, .fire, .item:
             return NodeType.ball.categoryBitMask
         }
     }

@@ -38,6 +38,10 @@ class GameSceneViewController: UIViewController, UIPencilInteractionDelegate {
         setupScene(stage: .instruction)
     }
 
+    func setup() {
+//        retry()
+    }
+
 
     func setupAudioPlayer() {
         if let pencilSoundDataAsset = NSDataAsset(name: "drawingSound") {
@@ -77,9 +81,11 @@ class GameSceneViewController: UIViewController, UIPencilInteractionDelegate {
 
     private func setupSpriteKitView() {
         skView = SKView(frame: view.bounds)
+        print(view.frame)
         skView.autoresizingMask = [.flexibleWidth, .flexibleHeight]
         skView.preferredFramesPerSecond = 120
         skView.ignoresSiblingOrder = true
+        skView.showsPhysics = true
         view.addSubview(skView)
     }
 
@@ -95,7 +101,7 @@ class GameSceneViewController: UIViewController, UIPencilInteractionDelegate {
         scene.delegate = self
         scene.physicsWorld.contactDelegate = self
         scene.childNode(withName: "background")?.zPosition = -1
-        [NodeType.fire, NodeType.goal].forEach { nodeType in
+        [NodeType.fire, NodeType.basket].forEach { nodeType in
             scene.enumerateChildNodes(withName: nodeType.name) { node, _ in
                 guard let texture = (node as? SKSpriteNode)?.texture else { return }
                 node.physicsBody = SKPhysicsBody(texture: texture, size: node.frame.size)
@@ -149,8 +155,7 @@ extension GameSceneViewController: SKPhysicsContactDelegate, SKSceneDelegate {
         switch nodeA.name {
         case NodeType.fire.name:
             missedBall()
-        case NodeType.goal.name:
-            nodeB.removeFromParent()
+        case NodeType.basket.name:
             goal()
         default:
             if Item.allCases.map({ $0.name }).contains(nodeA.name) {
