@@ -9,7 +9,7 @@ import Foundation
 import Combine
 
 class ContentViewModel: ObservableObject {
-
+    @Published var isRightHanded: Bool
     @Published var isReadyToPlay = true
     @Published var showResult = false
     @Published var showGoalConfirm = false
@@ -18,6 +18,10 @@ class ContentViewModel: ObservableObject {
     let goNextAction = PassthroughSubject<Void, Never>()
 
     @Published var collectedItems = [Item]()
+
+    init(isRightHanded: Bool) {
+        self.isRightHanded = isRightHanded
+    }
 
     func didTapPlay() {
         if isReadyToPlay {

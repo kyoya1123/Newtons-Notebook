@@ -16,6 +16,7 @@ struct ContentView: View {
                 VStack {
                     HStack {
                         Spacer()
+                            .frame(maxWidth: viewModel.isRightHanded ? 16 : .infinity)
                         Button {
                             viewModel.didTapPlay()
                         } label: {
@@ -25,7 +26,7 @@ struct ContentView: View {
                         }
                         .opacity(viewModel.showGoalConfirm ? 0 : 1)
                         Spacer()
-                            .frame(maxWidth: 16)
+                            .frame(maxWidth: viewModel.isRightHanded ? .infinity : 16)
                     }
                     Spacer()
                 }
@@ -62,6 +63,6 @@ struct ContentView: View {
 
 struct ContentView_Previews: PreviewProvider {
     static var previews: some View {
-        ContentView(viewModel: .init())
+        ContentView(viewModel: .init(isRightHanded: true))
     }
 }
