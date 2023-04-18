@@ -58,6 +58,7 @@ struct TopView: View {
         .navigationViewStyle(.stack)
         .onAppear {
             orientation = (UIApplication.shared.windows.first?.windowScene?.interfaceOrientation.isLandscape)! ? .landscapeLeft : .portrait
+            print(UIScreen.main.bounds)
         }
         .onRotate { newOrientation in
             if newOrientation != .unknown {

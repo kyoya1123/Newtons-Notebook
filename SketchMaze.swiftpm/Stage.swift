@@ -14,8 +14,8 @@ enum Stage: String, CaseIterable {
     case stage3
     case stage4
     
-    var scene: SKScene {
-        SKScene(fileNamed: rawValue)!
+    func scene(screenFrame: CGRect) -> SKScene {
+        SKScene(fileNamed: rawValue + (max(screenFrame.width, screenFrame.height) == 1366 ? "_12_9" : "_11") )!
     }
 
     var next: Stage? {

@@ -88,7 +88,7 @@ class GameSceneViewController: UIViewController, UIPencilInteractionDelegate {
             scene.removeFromParent()
         }
         currentStage = stage
-        scene = stage.scene
+        scene = stage.scene(screenFrame: UIScreen.main.bounds)
         scene.size = view.bounds.size
         scene.scaleMode = .aspectFit
         scene.physicsWorld.gravity = CGVector(dx: 0, dy: 0)
