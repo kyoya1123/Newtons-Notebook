@@ -5,6 +5,7 @@
 //  Created by Kyoya Yamaguchi on 2023/04/18.
 //
 
+import UIKit
 import SwiftUI
 
 struct ResultView: View {
@@ -74,8 +75,8 @@ struct ResultView: View {
             }
             .frame(maxWidth: .infinity, maxHeight: .infinity)
             .background(
-                Color.black.opacity(0.4)
-                    .edgesIgnoringSafeArea(.all)
+                VisualEffectView(effect: UIBlurEffect(style: .regular))
+                    .ignoresSafeArea()
             )
             .onTapGesture {
                 showExplanation = false

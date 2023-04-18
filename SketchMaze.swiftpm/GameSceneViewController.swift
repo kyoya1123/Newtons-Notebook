@@ -14,16 +14,16 @@ class GameSceneViewController: UIViewController, UIPencilInteractionDelegate {
 
     var coordinator: GameSceneViewRepresentable.Coordinator?
 
-    @IBOutlet var canvasView: PKCanvasView!
-    @IBOutlet var skView: SKView!
+    var canvasView: PKCanvasView!
+    var skView: SKView!
     var currentStage: Stage = .instruction
-    private var scene: SKScene!
+    var scene: SKScene!
 
     var pencilAudioPlayer: AVAudioPlayer!
     var itemAudioPlayer: AVAudioPlayer!
 
 
-    let blackInk = PKInkingTool(ink: PKInk(.pen, color: .black), width: 3)
+    let blackInk = PKInkingTool(ink: PKInk(.pen, color: .gray), width: 3)
     
 
     var collectedItems = [Item]()
@@ -61,7 +61,7 @@ class GameSceneViewController: UIViewController, UIPencilInteractionDelegate {
         }
     }
     
-    private func setupCanvasView() {
+    func setupCanvasView() {
         canvasView = PKCanvasView(frame: view.bounds)
         canvasView.backgroundColor = .clear
         canvasView.delegate = self
@@ -74,17 +74,16 @@ class GameSceneViewController: UIViewController, UIPencilInteractionDelegate {
         view.addSubview(canvasView)
     }
 
-    private func setupSpriteKitView() {
+    func setupSpriteKitView() {
         skView = SKView(frame: view.bounds)
         print(view.frame)
         skView.autoresizingMask = [.flexibleWidth, .flexibleHeight]
         skView.preferredFramesPerSecond = 120
         skView.ignoresSiblingOrder = true
-        skView.showsPhysics = true
         view.addSubview(skView)
     }
 
-    private func setupScene(stage: Stage, isRetry: Bool = false) {
+    func setupScene(stage: Stage, isRetry: Bool = false) {
         if scene != nil {
             scene.removeFromParent()
         }
@@ -118,6 +117,10 @@ class GameSceneViewController: UIViewController, UIPencilInteractionDelegate {
         }
         if stage == .instruction || isRetry {
             skView.presentScene(scene)
+//            scene.physicsWorld.gravity = CGVector(dx: 0, dy: 0)
+//            DispatchQueue.main.asyncAfter(deadline: .now() + 2) {
+//                self.scene.physicsWorld.gravity = CGVector(dx: 0, dy: -9.8)
+//            }
         } else {
             skView.presentScene(scene, transition: .push(with: .up, duration: 2))
         }

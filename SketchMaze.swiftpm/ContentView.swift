@@ -1,4 +1,5 @@
 import SwiftUI
+import UIKit
 
 struct ContentView: View {
 
@@ -48,8 +49,8 @@ struct ContentView: View {
                 }
                 .frame(maxWidth: .infinity, maxHeight: .infinity)
                 .background {
-                    Color.black.opacity(0.2)
-                        .edgesIgnoringSafeArea(.all)
+                    VisualEffectView(effect: UIBlurEffect(style: .regular))
+                        .ignoresSafeArea()
                 }
                 .opacity(viewModel.showGoalConfirm ? 1 : 0)
             }
