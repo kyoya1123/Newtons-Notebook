@@ -17,17 +17,18 @@ struct ContentView: View {
                 VStack {
                     HStack {
                         Spacer()
-                            .frame(maxWidth: viewModel.isRightHanded ? 16 : .infinity)
-                        Button {
-                            viewModel.didTapPlay()
-                        } label: {
-                            Image(viewModel.isReadyToPlay ? "play" : "retry")
-                                .resizable()
-                                .frame(width: 80, height: 80)
+                            .frame(maxWidth: 16)
+                        if viewModel.isRightHanded {
+                            playRetryButton
+                            Spacer()
+                            collectedItemView
+                        } else {
+                            collectedItemView
+                            Spacer()
+                            playRetryButton
                         }
-                        .opacity((viewModel.showGoalConfirm || viewModel.isPlayButtonHidden) ? 0 : 1)
                         Spacer()
-                            .frame(maxWidth: viewModel.isRightHanded ? .infinity : 16)
+                            .frame(maxWidth: 16)
                     }
                     Spacer()
                 }
@@ -66,7 +67,6 @@ struct ContentView: View {
                 .frame(maxWidth: .infinity, maxHeight: .infinity)
                 .background {
                     VisualEffectView(effect: UIBlurEffect(style: .regular))
-                        .ignoresSafeArea()
                 }
                 .opacity(orientation == .landscapeLeft || orientation == .landscapeRight ? 0 : 1)
             }
@@ -81,6 +81,40 @@ struct ContentView: View {
                 orientation = newOrientation
             }
         }
+    }
+
+    var playRetryButton: some View {
+        Button {
+            viewModel.didTapPlay()
+        } label: {
+            Image(viewModel.isReadyToPlay ? "play" : "retry")
+                .resizable()
+                .frame(width: 80, height: 80)
+        }
+        .opacity((viewModel.showGoalConfirm || viewModel.isPlayButtonHidden) ? 0 : 1)
+    }
+
+    var collectedItemView: some View {
+        HStack {
+            ForEach(Item.allCases, id: \.self) { item in
+                ZStack {
+                    Image(item.rawValue)
+                        .resizable()
+                        .aspectRatio(contentMode: .fit)
+                        .frame(width: 40, height: 40)
+                        .opacity(viewModel.collectedItems.contains(item) ? 1 : 0)
+                    Image(item.rawValue)
+                        .resizable()
+                        .aspectRatio(contentMode: .fit)
+                        .frame(width: 40, height: 40)
+                        .opacity(0.2)
+                }
+            }
+        }
+        .background(
+            VisualEffectView(effect: UIBlurEffect(style: .regular))
+        )
+        .padding(16)
     }
 }
 

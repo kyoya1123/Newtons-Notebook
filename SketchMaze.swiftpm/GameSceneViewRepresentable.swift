@@ -60,8 +60,8 @@ struct GameSceneViewRepresentable: UIViewControllerRepresentable {
             viewController.setupNextScene()
         }
 
-        func showResultView(collectedItems: [Item]) {
-            contentViewModel.showResultView(collectedItems: collectedItems)
+        func showResultView() {
+            contentViewModel.showResultView()
         }
 
         func showGoalConfirm() {
@@ -74,6 +74,10 @@ struct GameSceneViewRepresentable: UIViewControllerRepresentable {
 
         func setReadyToPlay(isReady: Bool) {
             contentViewModel.isReadyToPlay = isReady
+        }
+
+        func updateCollectedItems(collectedItems: [Item]) {
+            contentViewModel.collectedItems = collectedItems
         }
     }
 }

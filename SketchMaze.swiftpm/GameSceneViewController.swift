@@ -157,6 +157,7 @@ class GameSceneViewController: UIViewController, UIPencilInteractionDelegate {
     func retry() {
         setupScene(stage: currentStage, isRetry: true)
         newlyCollectedItems = []
+        coordinator?.updateCollectedItems(collectedItems: collectedItems + newlyCollectedItems)
         print("Collected Items: \(collectedItems)")
         canvasView.drawing = PKDrawing()
     }
@@ -201,7 +202,7 @@ extension GameSceneViewController: SKPhysicsContactDelegate, SKSceneDelegate {
         node.removeFromParent()
         guard let item = Item(rawValue: node.name ?? "") else { return }
         newlyCollectedItems.append(item)
-        print("Collected Items: \(collectedItems)")
+        coordinator?.updateCollectedItems(collectedItems: collectedItems + newlyCollectedItems)
         DispatchQueue.global(qos: .userInitiated).async {
             self.itemAudioPlayer.currentTime = 0
             self.itemAudioPlayer.play()
@@ -210,8 +211,6 @@ extension GameSceneViewController: SKPhysicsContactDelegate, SKSceneDelegate {
 
     func goal() {
         removeBall()
-        collectedItems += newlyCollectedItems
-        newlyCollectedItems = []
         //TODO: Goal sound
         coordinator?.showGoalConfirm()
     }
@@ -221,6 +220,8 @@ extension GameSceneViewController: SKPhysicsContactDelegate, SKSceneDelegate {
     }
 
     func setupNextScene() {
+        collectedItems += newlyCollectedItems
+        newlyCollectedItems = []
         guard let nextStage = currentStage.next else {
             showResultView()
             return
@@ -230,7 +231,7 @@ extension GameSceneViewController: SKPhysicsContactDelegate, SKSceneDelegate {
     }
 
     func showResultView() {
-        coordinator?.showResultView(collectedItems: collectedItems)
+        coordinator?.showResultView()
     }
 }
 

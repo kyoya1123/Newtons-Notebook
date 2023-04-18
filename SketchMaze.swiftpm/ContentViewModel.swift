@@ -38,8 +38,7 @@ class ContentViewModel: ObservableObject {
         goNextAction.send()
     }
 
-    func showResultView(collectedItems: [Item]) {
-        self.collectedItems = collectedItems
+    func showResultView() {
         showResult = true
     }
 }
