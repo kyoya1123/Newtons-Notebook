@@ -41,7 +41,7 @@ struct ResultView: View {
                     }
                 }
                 HStack {
-                    ForEach([Item.gravity, Item.magnet, Item.sound, Item.wave], id: \.self) { item in
+                    ForEach([Item.gravity, Item.magnet, Item.sound, Item.mechanic], id: \.self) { item in
                         ZStack {
                             Button {
                                 selectedItem = item

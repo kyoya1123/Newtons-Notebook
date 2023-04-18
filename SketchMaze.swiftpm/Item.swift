@@ -10,7 +10,7 @@ import Foundation
 enum Item: String, CaseIterable {
     case fluid
     case magnet
-    case wave
+    case mechanic
     case gravity
     case sound
     case electricity
@@ -27,8 +27,8 @@ enum Item: String, CaseIterable {
             return "Fluid"
         case .magnet:
             return "Magnetic Force"
-        case .wave:
-            return "Wave"
+        case .mechanic:
+            return "Mechanic"
         case .gravity:
             return "Gravity"
         case .sound:
@@ -48,8 +48,8 @@ enum Item: String, CaseIterable {
             return "Fluid description"
         case .magnet:
             return "Magnetic Force description"
-        case .wave:
-            return "Wave description"
+        case .mechanic:
+            return "Mechanic description"
         case .gravity:
             return "Gravity description"
         case .sound:

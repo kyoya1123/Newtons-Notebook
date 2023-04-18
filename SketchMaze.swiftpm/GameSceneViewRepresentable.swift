@@ -39,8 +39,8 @@ struct GameSceneViewRepresentable: UIViewControllerRepresentable {
                 self?.retry()
             }.store(in: &cancellables)
 
-            contentViewModel.addBallAction.sink { [weak self] _ in
-                self?.addBall()
+            contentViewModel.playAction.sink { [weak self] _ in
+                self?.applyGravity()
             }.store(in: &cancellables)
 
             contentViewModel.goNextAction.sink { [weak self] _ in
@@ -52,8 +52,9 @@ struct GameSceneViewRepresentable: UIViewControllerRepresentable {
             viewController.retry()
         }
 
-        func addBall() {
-            viewController.addBall()
+        //TODO: rename
+        func applyGravity() {
+            viewController.setGravity(enabled: true)
         }
 
         func goNext() {
@@ -66,6 +67,14 @@ struct GameSceneViewRepresentable: UIViewControllerRepresentable {
 
         func showGoalConfirm() {
             contentViewModel.showGoalConfirm = true
+        }
+
+        func setPlayButtonHidden(hidden: Bool) {
+            contentViewModel.isPlayButtonHidden = hidden
+        }
+
+        func setReadyToPlay(isReady: Bool) {
+            contentViewModel.isReadyToPlay = isReady
         }
     }
 }

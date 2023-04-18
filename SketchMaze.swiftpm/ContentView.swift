@@ -24,7 +24,7 @@ struct ContentView: View {
                                 .resizable()
                                 .frame(width: 80, height: 80)
                         }
-                        .opacity(viewModel.showGoalConfirm ? 0 : 1)
+                        .opacity((viewModel.showGoalConfirm || viewModel.isPlayButtonHidden) ? 0 : 1)
                         Spacer()
                             .frame(maxWidth: viewModel.isRightHanded ? .infinity : 16)
                     }

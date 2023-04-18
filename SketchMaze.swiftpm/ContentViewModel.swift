@@ -11,10 +11,11 @@ import Combine
 class ContentViewModel: ObservableObject {
     @Published var isRightHanded: Bool
     @Published var isReadyToPlay = true
+    @Published var isPlayButtonHidden = false
     @Published var showResult = false
     @Published var showGoalConfirm = false
     let retryAction = PassthroughSubject<Void, Never>()
-    let addBallAction = PassthroughSubject<Void, Never>()
+    let playAction = PassthroughSubject<Void, Never>()
     let goNextAction = PassthroughSubject<Void, Never>()
 
     @Published var collectedItems = [Item]()
@@ -25,7 +26,7 @@ class ContentViewModel: ObservableObject {
 
     func didTapPlay() {
         if isReadyToPlay {
-            addBallAction.send()
+            playAction.send()
         } else {
             retryAction.send()
         }

@@ -16,7 +16,7 @@ class GameSceneViewController: UIViewController, UIPencilInteractionDelegate {
 
     var canvasView: PKCanvasView!
     var skView: SKView!
-    var currentStage: Stage = .instruction
+    var currentStage: Stage = .opening
     var scene: SKScene!
 
     var pencilAudioPlayer: AVAudioPlayer!
@@ -28,14 +28,13 @@ class GameSceneViewController: UIViewController, UIPencilInteractionDelegate {
 
     var collectedItems = [Item]()
     var newlyCollectedItems = [Item]()
-    var ballNode: SKSpriteNode!
 
     override func viewDidLoad() {
         super.viewDidLoad()
         setupSpriteKitView()
         setupCanvasView()
         setupAudioPlayer()
-        setupScene(stage: .instruction)
+        setupScene(stage: .opening)
     }
 
     func setupAudioPlayer() {
@@ -91,7 +90,7 @@ class GameSceneViewController: UIViewController, UIPencilInteractionDelegate {
         scene = stage.scene
         scene.size = view.bounds.size
         scene.scaleMode = .aspectFit
-        scene.physicsWorld.gravity = CGVector(dx: 0, dy: -9.8)
+        scene.physicsWorld.gravity = CGVector(dx: 0, dy: 0)
         scene.delegate = self
         scene.physicsWorld.contactDelegate = self
         scene.childNode(withName: "background")?.zPosition = -1
@@ -113,34 +112,48 @@ class GameSceneViewController: UIViewController, UIPencilInteractionDelegate {
                 node.physicsBody?.isDynamic = false
                 node.zPosition = 1
                 node.setup(with: .item)
+//                let fadeInAction = SKAction.fadeAlpha(to: 0.3, duration: 1.0)
+//                let fadeOutAction = SKAction.fadeAlpha(to: 1.0, duration: 1.0)
+//                let fadeSequence = SKAction.sequence([fadeInAction, fadeOutAction])
+//                let repeatFadeAction = SKAction.repeatForever(fadeSequence)
+//                node.run(repeatFadeAction)
+
             }
         }
-        if stage == .instruction || isRetry {
+        setupBall()
+        if stage == .opening || isRetry {
             skView.presentScene(scene)
-//            scene.physicsWorld.gravity = CGVector(dx: 0, dy: 0)
-//            DispatchQueue.main.asyncAfter(deadline: .now() + 2) {
-//                self.scene.physicsWorld.gravity = CGVector(dx: 0, dy: -9.8)
-//            }
         } else {
             skView.presentScene(scene, transition: .push(with: .up, duration: 2))
+            coordinator?.setPlayButtonHidden(hidden: true)
+            DispatchQueue.main.asyncAfter(deadline: .now() + 2) {
+                self.coordinator?.setPlayButtonHidden(hidden: false)
+            }
         }
     }
 
-    func addBall() {
-        guard ballNode == nil else { return }
-        let location = CGPoint(x: 200, y: 0)
-        let ball = SKSpriteNode(texture: SKTexture(imageNamed: NodeType.ball.name), size: CGSize(width: 40, height: 40))
-        ball.position = location
-        ball.physicsBody = SKPhysicsBody(circleOfRadius: 20)
-        ball.setup(with: .ball)
-        ball.zPosition = 2
-        ballNode = ball
-        scene.addChild(ballNode)
+    func setupBall() {
+        guard let ballNode = scene.childNode(withName: NodeType.ball.name) else { return }
+        ballNode.physicsBody = SKPhysicsBody(circleOfRadius: 20)
+        ballNode.physicsBody?.affectedByGravity = true
+        ballNode.physicsBody?.isDynamic = true
+        ballNode.setup(with: .ball)
+        ballNode.zPosition = 2
+    }
+
+    func setGravity(enabled: Bool) {
+        scene.physicsWorld.gravity = CGVector(dx: 0, dy: enabled ? -9.8 : 0)
+        if currentStage == .opening {
+            coordinator?.setPlayButtonHidden(hidden: true)
+            DispatchQueue.main.asyncAfter(deadline: .now() + 1.5) {
+                self.setupNextScene()
+                self.coordinator?.setReadyToPlay(isReady: true)
+            }
+        }
     }
 
     func retry() {
         setupScene(stage: currentStage, isRetry: true)
-        ballNode = nil
         newlyCollectedItems = []
         print("Collected Items: \(collectedItems)")
         canvasView.drawing = PKDrawing()
@@ -151,8 +164,8 @@ extension GameSceneViewController: SKPhysicsContactDelegate, SKSceneDelegate {
     func didBegin(_ contact: SKPhysicsContact) {
         guard let nodeA = contact.bodyA.node, let nodeB = contact.bodyB.node else { return }
         switch nodeA.name {
-        case NodeType.fire.name:
-            missedBall()
+//        case NodeType.fire.name:
+//            missedBall()
         case NodeType.basket.name:
             goal()
         default:
@@ -177,17 +190,10 @@ extension GameSceneViewController: SKPhysicsContactDelegate, SKSceneDelegate {
 //        ballPosition.y > threshold || ballPosition.y < -(sceneSize.height + threshold)
 //    }
 
-    func missedBall() {
-        removeBall()
-        print("MISS")
-        retry()
-    }
-
-    func removeBall() {
-        let ballNode = scene.childNode(withName: NodeType.ball.name)
-        ballNode?.removeFromParent()
-        self.ballNode = nil
-    }
+//    func missedBall() {
+//        print("MISS")
+//        retry()
+//    }
 
     func getItem(node: SKNode) {
         node.removeFromParent()
@@ -201,15 +207,15 @@ extension GameSceneViewController: SKPhysicsContactDelegate, SKSceneDelegate {
     }
 
     func goal() {
-        //TODO: Goal sound
         removeBall()
         collectedItems += newlyCollectedItems
         newlyCollectedItems = []
-        if currentStage == .instruction {
-            setupNextScene()
-        } else {
-            coordinator?.showGoalConfirm()
-        }
+        //TODO: Goal sound
+        coordinator?.showGoalConfirm()
+    }
+
+    func removeBall() {
+        scene.childNode(withName: NodeType.ball.name)?.removeFromParent()
     }
 
     func setupNextScene() {
