@@ -20,10 +20,10 @@ let package = Package(
             teamIdentifier: "3X7LEN654Y",
             displayVersion: "1.0",
             bundleVersion: "1",
-            appIcon: .placeholder(icon: .sparkle),
+            appIcon: .placeholder(icon: .pencil),
             accentColor: .presetColor(.indigo),
             supportedDeviceFamilies: [
-                .pad,
+                .pad
             ],
             supportedInterfaceOrientations: [
                 .portrait,

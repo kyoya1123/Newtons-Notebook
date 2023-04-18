@@ -52,7 +52,6 @@ struct GameSceneViewRepresentable: UIViewControllerRepresentable {
             viewController.retry()
         }
 
-        //TODO: rename
         func applyGravity() {
             viewController.setGravity(enabled: true)
         }

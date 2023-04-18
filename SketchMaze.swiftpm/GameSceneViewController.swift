@@ -67,6 +67,7 @@ class GameSceneViewController: UIViewController, UIPencilInteractionDelegate {
         canvasView.tool = blackInk
         //TODO: pencilOnly
         canvasView.drawingPolicy = .anyInput
+        canvasView.isUserInteractionEnabled = false
         let pencilInteraction = UIPencilInteraction()
         pencilInteraction.delegate = self
         view.addInteraction(pencilInteraction)
@@ -127,6 +128,7 @@ class GameSceneViewController: UIViewController, UIPencilInteractionDelegate {
             skView.presentScene(scene, transition: .push(with: .up, duration: 2))
             coordinator?.setPlayButtonHidden(hidden: true)
             DispatchQueue.main.asyncAfter(deadline: .now() + 2) {
+                self.canvasView.isUserInteractionEnabled = true
                 self.coordinator?.setPlayButtonHidden(hidden: false)
             }
         }
@@ -223,6 +225,7 @@ extension GameSceneViewController: SKPhysicsContactDelegate, SKSceneDelegate {
             showResultView()
             return
         }
+        canvasView.isUserInteractionEnabled = false
         setupScene(stage: nextStage)
     }
 
