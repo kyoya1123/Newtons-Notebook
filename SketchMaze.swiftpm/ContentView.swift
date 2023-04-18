@@ -4,6 +4,7 @@ import UIKit
 struct ContentView: View {
 
     @ObservedObject var viewModel: ContentViewModel
+    @State var orientation = UIDeviceOrientation.unknown
 
     var body: some View {
         NavigationView {
@@ -54,10 +55,32 @@ struct ContentView: View {
                         .ignoresSafeArea()
                 }
                 .opacity(viewModel.showGoalConfirm ? 1 : 0)
+                VStack {
+                    Text("Play this game in landscape mode")
+                        .font(.largeTitle)
+                    Image(systemName: "rotate.right.fill")
+                        .resizable()
+                        .aspectRatio(contentMode: .fit)
+                        .frame(width: 200, height: 200)
+                }
+                .frame(maxWidth: .infinity, maxHeight: .infinity)
+                .background {
+                    VisualEffectView(effect: UIBlurEffect(style: .regular))
+                        .ignoresSafeArea()
+                }
+                .opacity(orientation == .landscapeLeft || orientation == .landscapeRight ? 0 : 1)
             }
         }
         .navigationBarBackButtonHidden(true)
         .navigationViewStyle(.stack)
+        .onAppear {
+            orientation = (UIApplication.shared.windows.first?.windowScene?.interfaceOrientation.isLandscape)! ? .landscapeLeft : .portrait
+        }
+        .onRotate { newOrientation in
+            if newOrientation != .unknown {
+                orientation = newOrientation
+            }
+        }
     }
 }
 

@@ -17,10 +17,9 @@ struct MyApp: App {
 
 class AppDelegate: NSObject, UIApplicationDelegate {
 
-  func application(_ application: UIApplication, didFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey : Any]? = nil) -> Bool {
-      try! AVAudioSession.sharedInstance().setCategory(.ambient)
-      try! AVAudioSession.sharedInstance().setActive(true)
-      return true
-  }
-
+    func application(_ application: UIApplication, didFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey : Any]? = nil) -> Bool {
+        try! AVAudioSession.sharedInstance().setCategory(.ambient)
+        try! AVAudioSession.sharedInstance().setActive(true)
+        return true
+    }
 }
