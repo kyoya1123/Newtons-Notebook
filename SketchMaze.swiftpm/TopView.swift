@@ -28,13 +28,14 @@ struct TopView: View {
                 Text("Which is your dominant hand?")
                     .font(.title3)
                     .bold()
-                HStack {
+                Picker("", selection: $isRightHanded) {
                     Text("Left")
-                    Toggle("", isOn: $isRightHanded)
-                        .labelsHidden()
-                        .toggleStyle(ColorfulToggleStyle())
+                        .tag(false)
                     Text("Right")
+                        .tag(true)
                 }
+                .pickerStyle(.segmented)
+                .frame(maxWidth: 200)
             }
         }
         .navigationViewStyle(.stack)
@@ -44,26 +45,5 @@ struct TopView: View {
 struct TopView_Previews: PreviewProvider {
     static var previews: some View {
         TopView()
-    }
-}
-
-struct ColorfulToggleStyle: ToggleStyle {
-    func makeBody(configuration: Configuration) -> some View {
-        HStack {
-            RoundedRectangle(cornerRadius: 16)
-                .fill(configuration.isOn ? Color.blue : Color.blue)
-                .frame(width: 50, height: 30)
-                .overlay(
-                    Circle()
-                        .fill(Color.white)
-                        .padding(3)
-                        .offset(x: configuration.isOn ? 10 : -10)
-                )
-                .onTapGesture {
-                    withAnimation {
-                        configuration.isOn.toggle()
-                    }
-                }
-        }
     }
 }
