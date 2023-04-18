@@ -59,7 +59,7 @@ enum NodeType: UInt32 {
         case .line:
             return 1.0
         case .ball:
-            return 1.0
+            return 0.2
         default:
             return 0.2
         }

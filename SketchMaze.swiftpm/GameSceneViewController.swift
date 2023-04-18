@@ -112,11 +112,11 @@ class GameSceneViewController: UIViewController, UIPencilInteractionDelegate {
                 node.physicsBody?.isDynamic = false
                 node.zPosition = 1
                 node.setup(with: .item)
-//                let fadeInAction = SKAction.fadeAlpha(to: 0.3, duration: 1.0)
-//                let fadeOutAction = SKAction.fadeAlpha(to: 1.0, duration: 1.0)
-//                let fadeSequence = SKAction.sequence([fadeInAction, fadeOutAction])
-//                let repeatFadeAction = SKAction.repeatForever(fadeSequence)
-//                node.run(repeatFadeAction)
+                //                let fadeInAction = SKAction.fadeAlpha(to: 0.3, duration: 1.0)
+                //                let fadeOutAction = SKAction.fadeAlpha(to: 1.0, duration: 1.0)
+                //                let fadeSequence = SKAction.sequence([fadeInAction, fadeOutAction])
+                //                let repeatFadeAction = SKAction.repeatForever(fadeSequence)
+                //                node.run(repeatFadeAction)
 
             }
         }
@@ -164,8 +164,8 @@ extension GameSceneViewController: SKPhysicsContactDelegate, SKSceneDelegate {
     func didBegin(_ contact: SKPhysicsContact) {
         guard let nodeA = contact.bodyA.node, let nodeB = contact.bodyB.node else { return }
         switch nodeA.name {
-//        case NodeType.fire.name:
-//            missedBall()
+            //        case NodeType.fire.name:
+            //            missedBall()
         case NodeType.basket.name:
             goal()
         default:
@@ -175,25 +175,25 @@ extension GameSceneViewController: SKPhysicsContactDelegate, SKSceneDelegate {
         }
     }
 
-//    func update(_ currentTime: TimeInterval, for scene: SKScene) {
-//        if isBallOutsideScreen {
-//            missedBall()
-//        }
-//    }
+    //    func update(_ currentTime: TimeInterval, for scene: SKScene) {
+    //        if isBallOutsideScreen {
+    //            missedBall()
+    //        }
+    //    }
 
-//    var isBallOutsideScreen: Bool {
-//        if ballNode == nil { return false }
-//        let sceneSize = scene.size
-//        let ballPosition = ballNode.position
-//        let threshold: CGFloat = 20
-//        return ballPosition.x < -threshold || ballPosition.x > sceneSize.width + threshold ||
-//        ballPosition.y > threshold || ballPosition.y < -(sceneSize.height + threshold)
-//    }
+    //    var isBallOutsideScreen: Bool {
+    //        if ballNode == nil { return false }
+    //        let sceneSize = scene.size
+    //        let ballPosition = ballNode.position
+    //        let threshold: CGFloat = 20
+    //        return ballPosition.x < -threshold || ballPosition.x > sceneSize.width + threshold ||
+    //        ballPosition.y > threshold || ballPosition.y < -(sceneSize.height + threshold)
+    //    }
 
-//    func missedBall() {
-//        print("MISS")
-//        retry()
-//    }
+    //    func missedBall() {
+    //        print("MISS")
+    //        retry()
+    //    }
 
     func getItem(node: SKNode) {
         node.removeFromParent()
@@ -235,9 +235,8 @@ extension GameSceneViewController: PKCanvasViewDelegate {
     func canvasViewDrawingDidChange(_ canvasView: PKCanvasView) {
         let lastStrokeIndex = canvasView.drawing.strokes.count - 1
         guard lastStrokeIndex >= 0 else { return }
-
+        guard let lastStroke = canvasView.drawing.strokes.last else { return }
         let canvasViewBounds = canvasView.bounds
-
         DispatchQueue.global(qos: .userInitiated).async {
             let image = canvasView.drawing.image(from: canvasViewBounds, scale: UIScreen.main.scale)
             let texture = SKTexture(image: image)
@@ -248,6 +247,7 @@ extension GameSceneViewController: PKCanvasViewDelegate {
             lineNode.physicsBody?.isDynamic = false
             lineNode.physicsBody?.affectedByGravity = false
             lineNode.setup(with: .line)
+            lineNode.physicsBody?.restitution = self.calculateRestitution(from: lastStroke)
             lineNode.zPosition = 1
 
             DispatchQueue.main.async {
@@ -257,6 +257,16 @@ extension GameSceneViewController: PKCanvasViewDelegate {
                 canvasView.drawing = updatedDrawing
                 self.scene.physicsWorld.speed = 1
             }
+        }
+    }
+
+    func calculateRestitution(from stroke: PKStroke) -> CGFloat {
+        let path = stroke.path
+        let average = path.map({ $0.force }).reduce(0, +) / CGFloat(path.count)
+        if average > 1.5 {
+            return 1.5
+        } else {
+            return average
         }
     }
 
