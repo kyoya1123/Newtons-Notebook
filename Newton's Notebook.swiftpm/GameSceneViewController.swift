@@ -21,6 +21,8 @@ class GameSceneViewController: UIViewController, UIPencilInteractionDelegate {
 
     var pencilAudioPlayer: AVAudioPlayer!
     var itemAudioPlayer: AVAudioPlayer!
+    var goalAudioPlayer: AVAudioPlayer!
+    var bounceAudioPlayer: AVAudioPlayer!
 
 
     let blackInk = PKInkingTool(ink: PKInk(.pen, color: .gray), width: 3)
@@ -42,7 +44,7 @@ class GameSceneViewController: UIViewController, UIPencilInteractionDelegate {
             do {
                 pencilAudioPlayer = try AVAudioPlayer(data: pencilSoundDataAsset.data)
                 pencilAudioPlayer.numberOfLoops = -1
-                pencilAudioPlayer.volume = 0.05
+                pencilAudioPlayer.volume = 0.2
                 pencilAudioPlayer.prepareToPlay()
             } catch {
                 print("Error loading audio file: \(error.localizedDescription)")
@@ -54,6 +56,26 @@ class GameSceneViewController: UIViewController, UIPencilInteractionDelegate {
                 itemAudioPlayer = try AVAudioPlayer(data: itemSoundDataAsset.data)
                 itemAudioPlayer.volume = 0.2
                 itemAudioPlayer.prepareToPlay()
+            } catch {
+                print("Error loading audio file: \(error.localizedDescription)")
+            }
+        }
+
+        if let goalSoundDataAsset = NSDataAsset(name: "goalSound") {
+            do {
+                goalAudioPlayer = try AVAudioPlayer(data: goalSoundDataAsset.data)
+                goalAudioPlayer.volume = 0.2
+                goalAudioPlayer.prepareToPlay()
+            } catch {
+                print("Error loading audio file: \(error.localizedDescription)")
+            }
+        }
+
+        if let  bounceSoundDataAsset = NSDataAsset(name: "bounceSound") {
+            do {
+                bounceAudioPlayer = try AVAudioPlayer(data: bounceSoundDataAsset.data)
+                bounceAudioPlayer.volume = 0.2
+                bounceAudioPlayer.prepareToPlay()
             } catch {
                 print("Error loading audio file: \(error.localizedDescription)")
             }
@@ -177,6 +199,12 @@ extension GameSceneViewController: SKPhysicsContactDelegate, SKSceneDelegate {
                 getItem(node: nodeA)
             }
         }
+        if nodeA.name == NodeType.line.name || nodeB.name == NodeType.line.name {
+            DispatchQueue.global(qos: . userInitiated).async {
+                self.bounceAudioPlayer.currentTime = 0
+                self.bounceAudioPlayer.play()
+            }
+        }
     }
 
     //    func update(_ currentTime: TimeInterval, for scene: SKScene) {
@@ -212,7 +240,10 @@ extension GameSceneViewController: SKPhysicsContactDelegate, SKSceneDelegate {
 
     func goal() {
         removeBall()
-        //TODO: Goal sound
+        DispatchQueue.global(qos: .background).async {
+            self.goalAudioPlayer.currentTime = 0
+            self.goalAudioPlayer.play()
+        }
         coordinator?.showGoalConfirm()
     }
 
