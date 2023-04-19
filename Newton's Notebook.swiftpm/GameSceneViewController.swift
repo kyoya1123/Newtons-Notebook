@@ -113,11 +113,11 @@ class GameSceneViewController: UIViewController, UIPencilInteractionDelegate {
                 node.physicsBody?.isDynamic = false
                 node.zPosition = 1
                 node.setup(with: .item)
-                //                let fadeInAction = SKAction.fadeAlpha(to: 0.3, duration: 1.0)
-                //                let fadeOutAction = SKAction.fadeAlpha(to: 1.0, duration: 1.0)
-                //                let fadeSequence = SKAction.sequence([fadeInAction, fadeOutAction])
-                //                let repeatFadeAction = SKAction.repeatForever(fadeSequence)
-                //                node.run(repeatFadeAction)
+                let fadeInAction = SKAction.fadeAlpha(to: 0.3, duration: 1.0)
+                let fadeOutAction = SKAction.fadeAlpha(to: 1.0, duration: 1.0)
+                let fadeSequence = SKAction.sequence([fadeInAction, fadeOutAction])
+                let repeatFadeAction = SKAction.repeat(fadeSequence, count: 1)
+                node.run(repeatFadeAction)
 
             }
         }
