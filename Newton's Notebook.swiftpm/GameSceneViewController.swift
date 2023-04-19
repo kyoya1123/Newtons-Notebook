@@ -168,8 +168,8 @@ extension GameSceneViewController: SKPhysicsContactDelegate, SKSceneDelegate {
     func didBegin(_ contact: SKPhysicsContact) {
         guard let nodeA = contact.bodyA.node, let nodeB = contact.bodyB.node else { return }
         switch nodeA.name {
-            //        case NodeType.fire.name:
-            //            missedBall()
+        case NodeType.fire.name:
+            removeBall()
         case NodeType.basket.name:
             goal()
         default:
