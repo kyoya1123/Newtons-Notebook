@@ -37,17 +37,25 @@ struct ContentView: View {
                         viewModel.showGoalConfirm = false
                         viewModel.didTapPlay()
                     } label: {
-                        Image("retry")
+                        Image(systemName: "arrow.clockwise")
                             .resizable()
+                            .aspectRatio(contentMode: .fit)
                             .frame(width: 80, height: 80)
+                            .fontWeight(.heavy)
+                            .tint(.black)
                     }
+                    Spacer()
+                        .frame(maxWidth: 40)
                     Button {
                         viewModel.showGoalConfirm = false
                         viewModel.didTapGoNext()
                     } label: {
-                        Image("next")
+                        Image(systemName: "forward.fill")
                             .resizable()
+                            .aspectRatio(contentMode: .fit)
                             .frame(width: 80, height: 80)
+                            .fontWeight(.heavy)
+                            .tint(.black)
                     }
                 }
                 .frame(maxWidth: .infinity, maxHeight: .infinity)
@@ -86,9 +94,13 @@ struct ContentView: View {
         Button {
             viewModel.didTapPlay()
         } label: {
-            Image(viewModel.isReadyToPlay ? "play" : "retry")
+            Image(systemName: viewModel.isReadyToPlay ? "play.fill" : "arrow.clockwise")
                 .resizable()
-                .frame(width: 80, height: 80)
+                .aspectRatio(contentMode: .fill)
+                .frame(width: 60, height: 60)
+                .fontWeight(.heavy)
+                .tint(.black)
+                .padding()
         }
         .opacity((viewModel.showGoalConfirm || viewModel.isPlayButtonHidden) ? 0 : 1)
     }

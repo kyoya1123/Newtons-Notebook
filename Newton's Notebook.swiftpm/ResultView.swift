@@ -24,7 +24,7 @@ struct ResultView: View {
                 Text("🎉 You've collected all of the fallen apples!! 🎉")
                     .font(.largeTitle)
                     .bold()
-                Image("basketWithApple")
+                Image("basketWithApple2")
                     .resizable()
                     .aspectRatio(contentMode: .fit)
                     .frame(width: 200, height: 200)
