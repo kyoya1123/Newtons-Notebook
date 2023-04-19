@@ -9,7 +9,8 @@ struct MyApp: App {
 
     var body: some Scene {
         WindowGroup {
-            TopView()
+//            TopView()
+            ResultView(collectedItems: Item.allCases)
         }
     }
 }

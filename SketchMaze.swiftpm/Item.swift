@@ -24,19 +24,19 @@ enum Item: String, CaseIterable {
     var displayName: String {
         switch self {
         case .fluid:
-            return "Fluid"
+            return "Fluids"
         case .magnet:
-            return "Magnetic Force"
+            return "Magnetism"
         case .mechanic:
-            return "Mechanic"
+            return "Mechanics"
         case .gravity:
             return "Gravity"
         case .wave:
-            return "Wave"
+            return "Waves"
         case .electricity:
             return "Electricity"
         case .atom:
-            return "Atom"
+            return "Atoms"
         case .astronomy:
             return "Astronomy"
         }
@@ -45,21 +45,21 @@ enum Item: String, CaseIterable {
     var description: String {
         switch self {
         case .fluid:
-            return "Fluid description"
+            return "Fluids, like water or air, can flow and change their shape to fill up any container. They are an important part of physics that studies how liquids and gases behave."
         case .magnet:
-            return "Magnetic Force description"
+            return "Have you ever played with a pair of magnets and felt them attract or repel each other? Magnetism is the force behind that, and it's a fascinating area of physics that deals with the behavior of magnets and magnetic materials."
         case .mechanic:
-            return "Mechanic description"
+            return "When you ride a bicycle, mechanics is the part of physics that explains how the wheels, pedals, and gears work together to make you move easily. It's all about understanding motion and the forces involved."
         case .gravity:
-            return "Gravity description"
+            return " Imagine dropping a ball, and it falls to the ground. Gravity is the force that pulls the ball and everything else towards the Earth. It's just one aspect of physics that how things interact."
         case .wave:
-            return "Wave description"
+            return "Imagine the sound you hear when someone plays a guitar or the way your radio receives signals. Waves are a way that energy moves through things like sound, electromagnetic waves (including radio waves), and light. They are an important part of physics that helps us understand how energy travels and interacts with our world."
         case .electricity:
-            return "Electricity description"
+            return "When you turn on a light or charge your iPhone, electricity powers these devices. This aspect of physics explores the movement of tiny particles called electrons and how they create the energy we use every day."
         case .atom:
-            return "Atom description"
+            return "Everything you see and touch is made up of tiny building blocks called atoms. They are part of the branch of physics called atomic physics, which helps us understand how these tiny particles come together to create the world around us."
         case .astronomy:
-            return "Astronomy description"
+            return "When you look at the stars in the night sky, you're seeing just a tiny part of our vast universe. Astronomy is the branch of physics that studies outer space and celestial objects, helping us learn more about the cosmos."
         }
     }
 
