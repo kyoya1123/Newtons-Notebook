@@ -38,8 +38,10 @@ struct ResultView: View {
                         ForEach(Item.firstFourItems, id: \.self) { item in
                             ZStack {
                                 Button {
-                                    selectedItem = item
-                                    showExplanation = true
+                                    withAnimation(.easeOut(duration: 0.2)) {
+                                        selectedItem = item
+                                        showExplanation = true
+                                    }
                                 } label: {
                                     Image(item.rawValue)
                                         .resizable()
@@ -59,8 +61,10 @@ struct ResultView: View {
                         ForEach(Item.lastFourItems, id: \.self) { item in
                             ZStack {
                                 Button {
-                                    selectedItem = item
-                                    showExplanation = true
+                                    withAnimation(.easeOut(duration: 0.2)) {
+                                        selectedItem = item
+                                        showExplanation = true
+                                    }
                                 } label: {
                                     Image(item.rawValue)
                                         .resizable()
@@ -104,7 +108,9 @@ struct ResultView: View {
                     .ignoresSafeArea()
             )
             .onTapGesture {
-                showExplanation = false
+                withAnimation(.easeOut(duration: 0.2)) {
+                    showExplanation = false
+                }
             }
             .opacity(showExplanation ? 1 : 0)
         }

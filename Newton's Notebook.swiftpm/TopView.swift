@@ -15,21 +15,32 @@ struct TopView: View {
     var body: some View {
         NavigationView {
             ZStack {
+                Image("note")
+                    .resizable()
+                    .aspectRatio(contentMode: .fill)
+                    .ignoresSafeArea()
                 VStack {
                     Text("Welcome to Newton's Notebook!")
                         .font(.largeTitle)
-                        .padding()
+                        .bold()
+                    Image("basket")
+                        .resizable()
+                        .aspectRatio(contentMode: .fit)
+                        .frame(width: 200, height: 200)
+                    Spacer()
+                        .frame(maxHeight: 50)
                     NavigationLink(destination: ContentView(viewModel: .init(isRightHanded: isRightHanded))) {
-                        Text("Begin")
+                        Text("Play")
                             .font(.title)
                             .foregroundColor(.white)
-                            .padding()
-                            .background(Color.blue)
+                            .padding(EdgeInsets(top: 16, leading: 32, bottom: 16, trailing: 32))
+                            .background(Color.accentColor)
                             .cornerRadius(10)
                     }
+                    Spacer()
+                        .frame(maxHeight: 32)
                     Text("Which is your dominant hand?")
-                        .font(.title3)
-                        .bold()
+                        .font(.title)
                     Picker("", selection: $isRightHanded) {
                         Text("Left")
                             .tag(false)
@@ -52,7 +63,7 @@ struct TopView: View {
                     VisualEffectView(effect: UIBlurEffect(style: .regular))
                         .ignoresSafeArea()
                 }
-                .opacity(orientation == .landscapeLeft || orientation == .landscapeRight ? 0 : 1)
+                .opacity(0)
             }
         }
         .navigationViewStyle(.stack)
