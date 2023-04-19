@@ -16,7 +16,7 @@ struct TopView: View {
         NavigationView {
             ZStack {
                 VStack {
-                    Text("Welcome to the Game!")
+                    Text("Welcome to Newton's Notebook!")
                         .font(.largeTitle)
                         .padding()
                     NavigationLink(destination: ContentView(viewModel: .init(isRightHanded: isRightHanded))) {

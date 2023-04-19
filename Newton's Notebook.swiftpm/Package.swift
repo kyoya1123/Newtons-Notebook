@@ -8,13 +8,13 @@ import PackageDescription
 import AppleProductTypes
 
 let package = Package(
-    name: "SketchMaze",
+    name: "Newton's Notebook",
     platforms: [
         .iOS("16.0")
     ],
     products: [
         .iOSApplication(
-            name: "SketchMaze",
+            name: "Newton's Notebook",
             targets: ["AppModule"],
             bundleIdentifier: "com.kyoya.SketchPuzzle",
             teamIdentifier: "3X7LEN654Y",
