@@ -65,6 +65,7 @@ struct TopView: View {
                 orientation = newOrientation
             }
         }
+        .preferredColorScheme(.light)
     }
 }
 

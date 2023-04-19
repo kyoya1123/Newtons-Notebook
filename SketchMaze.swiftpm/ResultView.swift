@@ -84,6 +84,7 @@ struct ResultView: View {
             .opacity(showExplanation ? 1 : 0)
         }
         .navigationBarBackButtonHidden(true)
+        .preferredColorScheme(.light)
     }
 }
 

@@ -81,6 +81,7 @@ struct ContentView: View {
                 orientation = newOrientation
             }
         }
+        .preferredColorScheme(.light)
     }
 
     var playRetryButton: some View {
@@ -111,10 +112,11 @@ struct ContentView: View {
                 }
             }
         }
-        .background(
-            VisualEffectView(effect: UIBlurEffect(style: .regular))
-        )
         .padding(16)
+        .background(
+            RoundedRectangle(cornerRadius: 16)
+                .fill(Color.white.opacity(0.7))
+        )
     }
 }
 
