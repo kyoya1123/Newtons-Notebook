@@ -63,7 +63,7 @@ struct TopView: View {
                     VisualEffectView(effect: UIBlurEffect(style: .regular))
                         .ignoresSafeArea()
                 }
-                .opacity(0)
+                .opacity(orientation == .landscapeLeft || orientation == .landscapeRight ? 0 : 1)
             }
         }
         .navigationViewStyle(.stack)
@@ -71,10 +71,8 @@ struct TopView: View {
             orientation = (UIApplication.shared.windows.first?.windowScene?.interfaceOrientation.isLandscape)! ? .landscapeLeft : .portrait
             print(UIScreen.main.bounds)
         }
-        .onRotate { newOrientation in
-            if newOrientation != .unknown {
-                orientation = newOrientation
-            }
+        .onRotate { isLandscape in
+            orientation = isLandscape ? .landscapeLeft : .portrait
         }
         .preferredColorScheme(.light)
     }

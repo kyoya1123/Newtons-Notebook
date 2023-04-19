@@ -76,10 +76,8 @@ struct ContentView: View {
         .onAppear {
             orientation = (UIApplication.shared.windows.first?.windowScene?.interfaceOrientation.isLandscape)! ? .landscapeLeft : .portrait
         }
-        .onRotate { newOrientation in
-            if newOrientation != .unknown {
-                orientation = newOrientation
-            }
+        .onRotate { isLandscape in
+            orientation = isLandscape ? .landscapeLeft : .portrait
         }
         .preferredColorScheme(.light)
     }
