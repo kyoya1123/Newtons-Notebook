@@ -12,7 +12,7 @@ enum Item: String, CaseIterable {
     case magnet
     case mechanic
     case gravity
-    case sound
+    case wave
     case electricity
     case atom
     case astronomy
@@ -31,8 +31,8 @@ enum Item: String, CaseIterable {
             return "Mechanic"
         case .gravity:
             return "Gravity"
-        case .sound:
-            return "Sound"
+        case .wave:
+            return "Wave"
         case .electricity:
             return "Electricity"
         case .atom:
@@ -52,8 +52,8 @@ enum Item: String, CaseIterable {
             return "Mechanic description"
         case .gravity:
             return "Gravity description"
-        case .sound:
-            return "Sound description"
+        case .wave:
+            return "Wave description"
         case .electricity:
             return "Electricity description"
         case .atom:
@@ -61,5 +61,13 @@ enum Item: String, CaseIterable {
         case .astronomy:
             return "Astronomy description"
         }
+    }
+
+    static var firstFourItems: [Item] {
+        [.astronomy, .gravity, .magnet, .wave]
+    }
+
+    static var lastFourItems: [Item] {
+        [.mechanic, .fluid, .atom, .electricity]
     }
 }

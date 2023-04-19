@@ -97,7 +97,7 @@ struct ContentView: View {
 
     var collectedItemView: some View {
         HStack {
-            ForEach(Item.allCases, id: \.self) { item in
+            ForEach(Item.firstFourItems + Item.lastFourItems, id: \.self) { item in
                 ZStack {
                     Image(item.rawValue)
                         .resizable()

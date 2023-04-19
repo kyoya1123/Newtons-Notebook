@@ -20,7 +20,7 @@ struct ResultView: View {
                 Text("You've collected all apples!!!")
                     .font(.largeTitle)
                 HStack {
-                    ForEach([Item.astronomy, Item.atom, Item.electricity, Item.fluid], id: \.self) { item in
+                    ForEach(Item.firstFourItems, id: \.self) { item in
                         ZStack {
                             Button {
                                 selectedItem = item
@@ -41,7 +41,7 @@ struct ResultView: View {
                     }
                 }
                 HStack {
-                    ForEach([Item.gravity, Item.magnet, Item.sound, Item.mechanic], id: \.self) { item in
+                    ForEach(Item.lastFourItems, id: \.self) { item in
                         ZStack {
                             Button {
                                 selectedItem = item
