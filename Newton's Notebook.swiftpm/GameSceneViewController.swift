@@ -87,8 +87,7 @@ class GameSceneViewController: UIViewController, UIPencilInteractionDelegate {
         canvasView.backgroundColor = .clear
         canvasView.delegate = self
         canvasView.tool = blackInk
-        //TODO: pencilOnly
-        canvasView.drawingPolicy = .anyInput
+        canvasView.drawingPolicy = .pencilOnly
         canvasView.isUserInteractionEnabled = false
         let pencilInteraction = UIPencilInteraction()
         pencilInteraction.delegate = self
@@ -206,26 +205,6 @@ extension GameSceneViewController: SKPhysicsContactDelegate, SKSceneDelegate {
             }
         }
     }
-
-    //    func update(_ currentTime: TimeInterval, for scene: SKScene) {
-    //        if isBallOutsideScreen {
-    //            missedBall()
-    //        }
-    //    }
-
-    //    var isBallOutsideScreen: Bool {
-    //        if ballNode == nil { return false }
-    //        let sceneSize = scene.size
-    //        let ballPosition = ballNode.position
-    //        let threshold: CGFloat = 20
-    //        return ballPosition.x < -threshold || ballPosition.x > sceneSize.width + threshold ||
-    //        ballPosition.y > threshold || ballPosition.y < -(sceneSize.height + threshold)
-    //    }
-
-    //    func missedBall() {
-    //        print("MISS")
-    //        retry()
-    //    }
 
     func getItem(node: SKNode) {
         node.removeFromParent()
