@@ -26,8 +26,9 @@ class GameSceneViewController: UIViewController, UIPencilInteractionDelegate {
     var burnAudioPlayer: AVAudioPlayer!
 
     let blackInk = PKInkingTool(ink: PKInk(.pen, color: .gray), width: 3)
-    
 
+    let bounceAudioNode = SKAudioNode(url: Bundle.main.url(forResource: "bounceSound", withExtension: "m4a")!)
+    var isPlayingAudio = false
     var collectedItems = [Item]()
     var newlyCollectedItems = [Item]()
 
@@ -154,6 +155,7 @@ class GameSceneViewController: UIViewController, UIPencilInteractionDelegate {
             }
         }
         setupBall()
+        setupBounceAudio()
         if stage == .opening || isRetry {
             skView.presentScene(scene)
         } else {
@@ -173,6 +175,12 @@ class GameSceneViewController: UIViewController, UIPencilInteractionDelegate {
         ballNode.physicsBody?.isDynamic = true
         ballNode.setup(with: .ball)
         ballNode.zPosition = 2
+    }
+
+    func setupBounceAudio() {
+        bounceAudioNode.removeFromParent()
+        bounceAudioNode.autoplayLooped = false
+        scene.addChild(bounceAudioNode)
     }
 
     func setGravity(enabled: Bool) {
@@ -200,10 +208,12 @@ extension GameSceneViewController: SKPhysicsContactDelegate, SKSceneDelegate {
         guard let nodeA = contact.bodyA.node, let nodeB = contact.bodyB.node else { return }
         switch nodeA.name {
         case NodeType.line.name:
-            DispatchQueue.global(qos: . userInitiated).async {
-                self.bounceAudioPlayer.currentTime = 0
-                self.bounceAudioPlayer.prepareToPlay()
-                self.bounceAudioPlayer.play()
+            if !isPlayingAudio {
+                bounceAudioNode.run(.play())
+                isPlayingAudio = true
+                DispatchQueue.main.asyncAfter(deadline: .now() + 0.2) {
+                    self.isPlayingAudio = false
+                }
             }
         case NodeType.fire.name:
             DispatchQueue.global(qos: . userInitiated).async {
@@ -247,6 +257,7 @@ extension GameSceneViewController: SKPhysicsContactDelegate, SKSceneDelegate {
     func setupNextScene() {
         collectedItems += newlyCollectedItems
         newlyCollectedItems = []
+        bounceAudioNode.removeFromParent()
         guard let nextStage = currentStage.next else {
             showResultView()
             return
