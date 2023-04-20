@@ -222,6 +222,9 @@ extension GameSceneViewController: SKPhysicsContactDelegate, SKSceneDelegate {
             }
             removeBall()
         case NodeType.basket.name:
+            if currentStage == .opening {
+                nodeB.removeFromParent()
+            }
             goal()
         default:
             if Item.allCases.map({ $0.name }).contains(nodeA.name) {
@@ -247,7 +250,9 @@ extension GameSceneViewController: SKPhysicsContactDelegate, SKSceneDelegate {
             self.goalAudioPlayer.currentTime = 0
             self.goalAudioPlayer.play()
         }
-        coordinator?.showGoalConfirm()
+        if currentStage != .opening {
+            coordinator?.showGoalConfirm()
+        }
     }
 
     func removeBall() {
