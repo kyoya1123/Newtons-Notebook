@@ -23,7 +23,7 @@ class GameSceneViewController: UIViewController, UIPencilInteractionDelegate {
     var itemAudioPlayer: AVAudioPlayer!
     var goalAudioPlayer: AVAudioPlayer!
     var bounceAudioPlayer: AVAudioPlayer!
-
+    var burnAudioPlayer: AVAudioPlayer!
 
     let blackInk = PKInkingTool(ink: PKInk(.pen, color: .gray), width: 3)
     
@@ -76,6 +76,16 @@ class GameSceneViewController: UIViewController, UIPencilInteractionDelegate {
                 bounceAudioPlayer = try AVAudioPlayer(data: bounceSoundDataAsset.data)
                 bounceAudioPlayer.volume = 0.2
                 bounceAudioPlayer.prepareToPlay()
+            } catch {
+                print("Error loading audio file: \(error.localizedDescription)")
+            }
+        }
+
+        if let  burnSoundDataAsset = NSDataAsset(name: "burnSound") {
+            do {
+                burnAudioPlayer = try AVAudioPlayer(data: burnSoundDataAsset.data)
+                burnAudioPlayer.volume = 0.2
+                burnAudioPlayer.prepareToPlay()
             } catch {
                 print("Error loading audio file: \(error.localizedDescription)")
             }
@@ -189,19 +199,23 @@ extension GameSceneViewController: SKPhysicsContactDelegate, SKSceneDelegate {
     func didBegin(_ contact: SKPhysicsContact) {
         guard let nodeA = contact.bodyA.node, let nodeB = contact.bodyB.node else { return }
         switch nodeA.name {
+        case NodeType.line.name:
+            DispatchQueue.global(qos: . userInitiated).async {
+                self.bounceAudioPlayer.currentTime = 0
+                self.bounceAudioPlayer.prepareToPlay()
+                self.bounceAudioPlayer.play()
+            }
         case NodeType.fire.name:
+            DispatchQueue.global(qos: . userInitiated).async {
+                self.burnAudioPlayer.currentTime = 0
+                self.burnAudioPlayer.play()
+            }
             removeBall()
         case NodeType.basket.name:
             goal()
         default:
             if Item.allCases.map({ $0.name }).contains(nodeA.name) {
                 getItem(node: nodeA)
-            }
-        }
-        if nodeA.name == NodeType.line.name || nodeB.name == NodeType.line.name {
-            DispatchQueue.global(qos: . userInitiated).async {
-                self.bounceAudioPlayer.currentTime = 0
-                self.bounceAudioPlayer.play()
             }
         }
     }
