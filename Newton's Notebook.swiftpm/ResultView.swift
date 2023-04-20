@@ -21,6 +21,19 @@ struct ResultView: View {
                 .aspectRatio(contentMode: .fill)
                 .ignoresSafeArea()
             VStack {
+//                HStack {
+////                    Spacer()
+////                        .frame(maxWidth: 32)
+//
+//                    .padding(16)
+//                    .background(RoundedRectangle(cornerRadius: 16)
+//                        .fill(Color.accentColor))
+//                    Spacer()
+//                }
+//                .padding(32)
+//                Spacer()
+//            }
+//            VStack {
                 Text("🎉 You've collected all of the fallen apples!! 🎉")
                     .font(.largeTitle)
                     .bold()
@@ -86,6 +99,18 @@ struct ResultView: View {
                     RoundedRectangle(cornerRadius: 32)
                         .fill(Color.accentColor.opacity(0.2))
                 )
+                Spacer()
+                    .frame(maxHeight: 32)
+                Button {
+                    NavigationUtil.popToRootView()
+                } label: {
+                    Text("Play again!")
+                        .bold()
+                        .tint(.white)
+                        .padding()
+                }
+                .background(RoundedRectangle(cornerRadius: 16)
+                    .fill(Color.accentColor))
             }
             HStack {
                 Spacer(minLength: 200)
@@ -122,5 +147,32 @@ struct ResultView: View {
 struct ResultView_Previews: PreviewProvider {
     static var previews: some View {
         ResultView(collectedItems: [.magnet, .astronomy])
+    }
+}
+
+
+struct NavigationUtil {
+    static func popToRootView() {
+        DispatchQueue.main.asyncAfter(deadline: .now()) {
+            findNavigationController(viewController:
+                                        UIApplication.shared.windows.filter { $0.isKeyWindow
+            }.first?.rootViewController)?
+                .popToRootViewController(animated: true)
+        }
+    }
+    static func findNavigationController(viewController: UIViewController?)
+    -> UINavigationController? {
+        guard let viewController = viewController else {
+            return nil
+        }
+        if let navigationController = viewController as? UINavigationController
+        {
+            return navigationController
+        }
+        for childViewController in viewController.children {
+            return findNavigationController(viewController:
+                                                childViewController)
+        }
+        return nil
     }
 }
