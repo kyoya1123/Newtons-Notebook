@@ -21,19 +21,6 @@ struct ResultView: View {
                 .aspectRatio(contentMode: .fill)
                 .ignoresSafeArea()
             VStack {
-//                HStack {
-////                    Spacer()
-////                        .frame(maxWidth: 32)
-//
-//                    .padding(16)
-//                    .background(RoundedRectangle(cornerRadius: 16)
-//                        .fill(Color.accentColor))
-//                    Spacer()
-//                }
-//                .padding(32)
-//                Spacer()
-//            }
-//            VStack {
                 Text("🎉 You've collected all of the fallen apples!! 🎉")
                     .font(.largeTitle)
                     .bold()
@@ -99,18 +86,6 @@ struct ResultView: View {
                     RoundedRectangle(cornerRadius: 32)
                         .fill(Color.accentColor.opacity(0.2))
                 )
-                Spacer()
-                    .frame(maxHeight: 32)
-                Button {
-                    NavigationUtil.popToRootView()
-                } label: {
-                    Text("Play again!")
-                        .bold()
-                        .tint(.white)
-                        .padding()
-                }
-                .background(RoundedRectangle(cornerRadius: 16)
-                    .fill(Color.accentColor))
             }
             HStack {
                 Spacer(minLength: 200)

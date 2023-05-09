@@ -74,6 +74,7 @@ struct TopView: View {
         .onRotate { isLandscape in
             orientation = isLandscape ? .landscapeLeft : .portrait
         }
+        .navigationBarBackButtonHidden(true)
         .preferredColorScheme(.light)
     }
 }
